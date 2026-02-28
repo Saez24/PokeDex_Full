@@ -1,1 +1,3 @@
-<p>content works!</p>
+@for (p of pokemon(); track p.id) {
+  <li>{{ p.name }} (ID: {{ p.id }})</li>
+}
