@@ -3,10 +3,11 @@ import { PokemonService } from '../../services/pokemon/pokemon';
 import { MatIconModule } from '@angular/material/icon';
 import { App } from '../../../app';
 import { Theme } from '../../services/theme/theme';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-header',
-  imports: [MatIconModule],
+  imports: [MatIconModule, MatSelectModule],
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
