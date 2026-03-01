@@ -19,7 +19,7 @@ export class PokemonService {
 
   total = computed(() => this.pokemon().length);
 
-  loadNext(): void {
+  loadMore(): void {
     if (this.loading() || !this.hasMore()) return;
 
     this.loading.set(true);

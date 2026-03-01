@@ -1,5 +1,5 @@
 <!-- ── Hero ── -->
-<section class="hero">
+<section class="hero reveal">
   <div class="hero-glow"></div>
   <div class="hero-eyebrow">Nationale Dex</div>
   <h1 class="hero-title">Alle Pokémon.<br />Auf einen Blick.</h1>
@@ -10,7 +10,7 @@
 <main class="grid">
   @for (p of pokemonService.pokemon(); track trackById($index, p)) {
     <div
-      class="card"
+      class="card reveal"
       [ngStyle]="{'--card-glow': primaryGlow(p), '--card-color': primaryColor(p)}"
       (click)="openDialog(p)"
     >

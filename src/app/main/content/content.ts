@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, effect, ElementRef, inject, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -20,16 +20,63 @@ import { Pokemon } from '../../shared/models/pokemon.model';
   styleUrl: './content.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Content implements OnInit {
+export class Content implements OnInit, AfterViewInit {
   private dialog = inject(MatDialog);
+  private observer!: IntersectionObserver;
   readonly pokemonService = inject(PokemonService);
-
   readonly TYPE_COLORS = TYPE_COLORS;
   readonly STAT_LABELS = STAT_LABELS;
 
-  ngOnInit(): void {
-    this.pokemonService.loadNext();
+  constructor(
+    private el: ElementRef,
+  ) {
+    this.initObserver();
+
+    effect(() => {
+      this.pokemonService.pokemon();
+
+      queueMicrotask(() => {
+        this.observeNewCards();
+      });
+    });
   }
+
+  ngOnInit(): void {
+    this.pokemonService.loadMore();
+  }
+
+ngAfterViewInit() {
+  this.initObserver();
+  this.observeNewCards();
+}
+
+private initObserver() {
+  this.observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const el = entry.target as HTMLElement;
+          el.classList.add('is-visible');
+          this.observer.unobserve(el);
+        }
+      });
+    },
+    {
+      threshold: 0.15,
+      rootMargin: '0px 0px -60px 0px'
+    }
+  );
+}
+
+private observeNewCards() {
+  const elements =
+    this.el.nativeElement.querySelectorAll('.reveal:not(.is-visible)');
+
+  elements.forEach((el: HTMLElement, index: number) => {
+    el.style.setProperty('--reveal-delay', `${index * 20}ms`);
+    this.observer.observe(el);
+  });
+}
 
   openDialog(pokemon: Pokemon): void {
     this.dialog.open(PokemonDialog, {
@@ -41,9 +88,14 @@ export class Content implements OnInit {
     });
   }
 
-  loadMore(): void {
-    this.pokemonService.loadNext();
-  }
+  loadMore() {
+  this.pokemonService.loadMore();
+
+  setTimeout(() => {
+    this.observeNewCards();
+  }, 50);
+}
+
 
   primaryColor(p: Pokemon): string {
     return getPrimaryColor(p.types);

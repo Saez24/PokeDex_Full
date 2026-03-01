@@ -49,7 +49,7 @@
           </div>
           <div class="info-pill">
             <div class="info-pill-label">Basis-Exp</div>
-            <div class="info-pill-value">{{ pokemon.base_experience ?? '–' }}</div>
+            <div class="info-pill-value">{{ pokemon.base_experience }}</div>
           </div>
         </div>
 
@@ -57,7 +57,7 @@
         <div class="section-title">Basiswerte</div>
         @for (stat of pokemon.stats; track stat.stat.name) {
           <div class="stat-row">
-            <span class="stat-label">{{ STAT_LABELS[stat.stat.name] ?? stat.stat.name }}</span>
+            <span class="stat-label">{{ STAT_LABELS[stat.stat.name] || stat.stat.name }}</span>
             <span class="stat-val">{{ stat.base_stat }}</span>
             <div class="stat-track">
               <div class="stat-fill"
