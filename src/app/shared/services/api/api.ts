@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { PokeEndpoint } from '../models/poke-endpoint.type';
+import { PokeEndpoint } from '../../models/poke-endpoint.type';
 
 @Injectable({
   providedIn: 'root',

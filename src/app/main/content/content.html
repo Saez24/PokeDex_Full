@@ -1,3 +1,92 @@
-@for (p of pokemon(); track p.id) {
-  <li>{{ p.name }} (ID: {{ p.id }})</li>
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-eyebrow">Nationale Dex</div>
+  <h1 class="hero-title">Alle Pokémon.<br />Auf einen Blick.</h1>
+  <p class="hero-sub">Entdecke und erforsche die gesamte Pokémon-Welt.</p>
+</section>
+
+<!-- ── Grid ── -->
+<main class="grid">
+  @for (p of pokemonService.pokemon(); track trackById($index, p)) {
+    <div
+      class="card"
+      [ngStyle]="{'--card-glow': primaryGlow(p), '--card-color': primaryColor(p)}"
+      (click)="openDialog(p)"
+    >
+      <!-- Top row -->
+      <div class="card-top">
+        <span class="card-num">#{{ paddedId(p.id) }}</span>
+        <div class="card-dots">
+          @for (t of p.types; track t.slot) {
+            <span
+              class="type-dot"
+              [ngStyle]="{
+                background: TYPE_COLORS[t.type.name],
+                'box-shadow': '0 0 6px ' + TYPE_COLORS[t.type.name]
+              }"
+            ></span>
+          }
+        </div>
+      </div>
+
+      <!-- Sprite -->
+      <div class="card-art">
+        <img
+          class="card-sprite"
+          [src]="spriteUrl(p)"
+          [alt]="p.name"
+          loading="lazy"
+        />
+      </div>
+
+      <!-- Info -->
+      <div class="card-bottom">
+        <div class="card-name">{{ p.name }}</div>
+        <div class="card-type-label">
+          {{ p.types.map(t => t.type.name).join(' · ') }}
+        </div>
+
+        <!-- Mini stat bars -->
+        <div class="card-stats">
+          @for (stat of p.stats.slice(0, 3); track stat.stat.name) {
+            <div class="stat-micro">
+              <span class="stat-micro-label">{{ STAT_LABELS[stat.stat.name] }}</span>
+              <div class="stat-micro-track">
+                <div
+                  class="stat-micro-fill"
+                  [ngStyle]="{width: statPercent(stat.base_stat) + '%'}"
+                ></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Skeleton cards while loading -->
+  @if (pokemonService.loading()) {
+    @for (i of [1,2,3,4,5,6,7,8]; track i) {
+      <div class="card skeleton"></div>
+    }
+  }
+</main>
+
+<!-- ── Load More ── -->
+@if (pokemonService.hasMore()) {
+  <div class="load-wrap">
+    <button
+      class="load-btn"
+      [disabled]="pokemonService.loading()"
+      (click)="loadMore()"
+    >
+      @if (pokemonService.loading()) {
+        <mat-spinner diameter="18" strokeWidth="2" />
+      } @else {
+        Weitere laden
+      }
+    </button>
+    <span class="load-hint">20 weitere Pokémon</span>
+  </div>
 }

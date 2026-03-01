@@ -1,0 +1,296 @@
+/* ── Variables ── */
+:host {
+  display: block;
+  background: #000;
+  min-height: 100vh;
+  color: #f5f5f7;
+  font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Hero ── */
+.hero {
+  padding: 100px 24px 48px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-glow {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 560px;
+  height: 260px;
+  background: radial-gradient(ellipse at center, rgba(41, 151, 255, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #2997ff;
+  margin-bottom: 14px;
+}
+
+.hero-title {
+  font-size: clamp(2.6rem, 5.5vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.06;
+  background: linear-gradient(180deg, #fff 0%, rgba(255, 255, 255, 0.55) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 14px;
+}
+
+.hero-sub {
+  font-size: 1.05rem;
+  font-weight: 300;
+  color: rgba(245, 245, 247, 0.55);
+  letter-spacing: -0.01em;
+}
+
+/* ── Grid ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 2px;
+  padding: 8px 24px 24px;
+}
+
+/* ── Card ── */
+.card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform 0.32s cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 0.32s cubic-bezier(0.23, 1, 0.32, 1),
+    background 0.2s;
+
+  /* Entrance animation */
+  animation: cardIn 0.45s cubic-bezier(0.23, 1, 0.32, 1) both;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at var(--mx, 50%) var(--my, 50%),
+      var(--card-glow, transparent) 0%,
+      transparent 55%
+    );
+    opacity: 0;
+    transition: opacity 0.35s;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.07);
+    transform: scale(1.025);
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.15);
+
+    &::before { opacity: 1; }
+
+    .card-sprite {
+      transform: translateY(-8px) scale(1.1);
+      filter: drop-shadow(0 16px 28px var(--card-glow, rgba(255,255,255,0.15)));
+    }
+  }
+
+  &.skeleton {
+    height: 260px;
+    animation: shimmer 1.5s ease-in-out infinite;
+    cursor: default;
+    &:hover { transform: none; box-shadow: none; }
+  }
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%, 100% { background: rgba(255, 255, 255, 0.04); }
+  50%       { background: rgba(255, 255, 255, 0.08); }
+}
+
+/* Card zones */
+.card-top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 18px 18px 0;
+}
+
+.card-num {
+  font-size: 0.67rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: rgba(245, 245, 247, 0.25);
+}
+
+.card-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.type-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.card-art {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 10px;
+}
+
+.card-sprite {
+  width: 108px;
+  height: 108px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 18px var(--card-glow, rgba(255,255,255,0.1)));
+  transition:
+    transform 0.38s cubic-bezier(0.23, 1, 0.32, 1),
+    filter 0.38s;
+}
+
+.card-bottom {
+  position: relative;
+  z-index: 1;
+  padding: 0 18px 20px;
+}
+
+.card-name {
+  font-size: 0.97rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #f5f5f7;
+  text-transform: capitalize;
+  margin-bottom: 2px;
+}
+
+.card-type-label {
+  font-size: 0.7rem;
+  color: rgba(245, 245, 247, 0.35);
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+  margin-bottom: 12px;
+}
+
+/* Mini stats */
+.card-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.stat-micro {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.stat-micro-label {
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(245, 245, 247, 0.3);
+  width: 26px;
+  text-transform: uppercase;
+}
+
+.stat-micro-track {
+  flex: 1;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.stat-micro-fill {
+  height: 100%;
+  border-radius: 1px;
+  background: var(--card-color, rgba(255, 255, 255, 0.3));
+  opacity: 0.6;
+}
+
+/* ── Load More ── */
+.load-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 24px 72px;
+}
+
+.load-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 160px;
+  height: 44px;
+  padding: 0 2rem;
+  border-radius: 999px;
+  border: none;
+  background: #2997ff;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 0 0 rgba(41, 151, 255, 0.4);
+
+  &:hover:not(:disabled) {
+    background: #47a9ff;
+    transform: scale(1.04);
+    box-shadow: 0 0 28px rgba(41, 151, 255, 0.4);
+  }
+
+  &:active:not(:disabled) { transform: scale(0.98); }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  mat-spinner { --mdc-circular-progress-active-indicator-color: #fff; }
+}
+
+.load-hint {
+  font-size: 0.72rem;
+  color: rgba(245, 245, 247, 0.3);
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 8px 12px 12px;
+  }
+
+  .hero { padding: 80px 16px 32px; }
+  .hero-title { font-size: 2.4rem; }
+  .nav { padding: 0 16px; }
+}

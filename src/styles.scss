@@ -37,3 +37,30 @@ body {
   height: 100%;
 }
 /* You can add global styles to this file, and also import other style files */
+
+/* ── Füge dies in deine globale styles.scss ein ── */
+
+/* Dialog Panel Override */
+.poke-dialog-panel {
+  .mat-mdc-dialog-container {
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 28px !important;
+    overflow: visible !important;
+  }
+
+  .mat-mdc-dialog-surface {
+    background: transparent !important;
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+    border-radius: 28px !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Backdrop */
+.poke-dialog-backdrop {
+  background: rgba(0, 0, 0, 0.75) !important;
+  backdrop-filter: saturate(120%) blur(24px) !important;
+  -webkit-backdrop-filter: saturate(120%) blur(24px) !important;
+}

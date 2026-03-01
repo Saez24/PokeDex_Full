@@ -1,0 +1,98 @@
+<div class="dialog-container">
+
+  <!-- Art Section -->
+  <div class="d-art" [ngStyle]="{'--d-glow': primaryGlow}">
+    <div class="d-art-bg"></div>
+    <div class="d-art-grid"></div>
+    <img
+      class="d-sprite"
+      [src]="spriteUrl"
+      [alt]="pokemon.name"
+    />
+    <button class="d-close" (click)="close()">
+      <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M1 1l12 12M13 1L1 13"/>
+      </svg>
+    </button>
+    <div class="d-num">#{{ paddedId }}</div>
+  </div>
+
+  <!-- Body -->
+  <div class="d-body">
+
+    <!-- Name + Types -->
+    <div class="d-header">
+      <div class="d-name">{{ pokemon.name }}</div>
+      <div class="d-badges">
+        @for (t of pokemon.types; track t.slot) {
+          <span
+            class="d-badge"
+            [ngStyle]="{
+              background: TYPE_COLORS[t.type.name] + '33',
+              'border-color': TYPE_COLORS[t.type.name] + '66',
+              color: TYPE_COLORS[t.type.name]
+            }"
+          >{{ t.type.name }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="d-divider"></div>
+
+    <!-- Info Grid -->
+    <div class="d-info">
+      <div class="d-info-cell">
+        <div class="d-info-label">Größe</div>
+        <div class="d-info-value">{{ (pokemon.height / 10).toFixed(1) }} m</div>
+      </div>
+      <div class="d-info-cell">
+        <div class="d-info-label">Gewicht</div>
+        <div class="d-info-value">{{ (pokemon.weight / 10).toFixed(1) }} kg</div>
+      </div>
+      <div class="d-info-cell">
+        <div class="d-info-label">Basis-Exp</div>
+        <div class="d-info-value">{{ pokemon.base_experience ?? '–' }}</div>
+      </div>
+      <div class="d-info-cell">
+        <div class="d-info-label">Pokédex-Nr</div>
+        <div class="d-info-value">#{{ paddedId }}</div>
+      </div>
+    </div>
+
+    <div class="d-divider"></div>
+
+    <!-- Stats -->
+    <div class="d-section-title">Basiswerte</div>
+    @for (stat of pokemon.stats; track stat.stat.name) {
+      <div class="d-stat">
+        <div class="d-stat-label">{{ STAT_LABELS[stat.stat.name] ?? stat.stat.name }}</div>
+        <div class="d-stat-val">{{ stat.base_stat }}</div>
+        <div class="d-stat-track">
+          <div
+            class="d-stat-fill"
+            [ngStyle]="{
+              width: statPercent(stat.base_stat) + '%',
+              background: statColor(stat.base_stat)
+            }"
+          ></div>
+        </div>
+      </div>
+    }
+
+    <div class="d-divider"></div>
+
+    <!-- Abilities -->
+    <div class="d-section-title">Fähigkeiten</div>
+    <div class="d-abilities">
+      @for (a of pokemon.abilities; track a.slot) {
+        <span class="d-ability" [class.hidden-ab]="a.is_hidden">
+          {{ a.ability.name.replace('-', ' ') }}
+          @if (a.is_hidden) {
+            <span class="hidden-label">versteckt</span>
+          }
+        </span>
+      }
+    </div>
+
+  </div>
+</div>

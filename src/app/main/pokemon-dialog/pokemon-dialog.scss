@@ -1,0 +1,242 @@
+:host {
+  display: block;
+}
+
+.dialog-container {
+  background: rgba(28, 28, 30, 0.98);
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ── Art Section ── */
+.d-art {
+  position: relative;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.d-art-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 65%,
+    var(--d-glow, rgba(255, 255, 255, 0.2)) 0%,
+    transparent 70%
+  );
+}
+
+.d-art-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.d-sprite {
+  position: relative;
+  z-index: 2;
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 32px var(--d-glow, rgba(255, 255, 255, 0.2)));
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+
+.d-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(245, 245, 247, 0.7);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+}
+
+.d-num {
+  position: absolute;
+  bottom: 14px;
+  left: 18px;
+  z-index: 2;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Body ── */
+.d-body {
+  padding: 22px 24px 28px;
+}
+
+.d-header {
+  margin-bottom: 18px;
+}
+
+.d-name {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  text-transform: capitalize;
+  color: #f5f5f7;
+  margin-bottom: 8px;
+}
+
+.d-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.d-badge {
+  padding: 0.25rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+/* ── Divider ── */
+.d-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 18px 0;
+}
+
+/* ── Info Grid ── */
+.d-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.d-info-cell {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.d-info-label {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(245, 245, 247, 0.35);
+  margin-bottom: 4px;
+}
+
+.d-info-value {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #f5f5f7;
+}
+
+/* ── Section Title ── */
+.d-section-title {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(245, 245, 247, 0.35);
+  margin-bottom: 12px;
+}
+
+/* ── Stats ── */
+.d-stat {
+  display: grid;
+  grid-template-columns: 44px 34px 1fr;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+
+.d-stat-label {
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: rgba(245, 245, 247, 0.35);
+  text-align: right;
+}
+
+.d-stat-val {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #f5f5f7;
+  text-align: right;
+}
+
+.d-stat-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.d-stat-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.9s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+}
+
+/* ── Abilities ── */
+.d-abilities {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.d-ability {
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgba(245, 245, 247, 0.7);
+  text-transform: capitalize;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &.hidden-ab {
+    background: rgba(41, 151, 255, 0.1);
+    border-color: rgba(41, 151, 255, 0.3);
+    color: #2997ff;
+  }
+}
+
+.hidden-label {
+  font-size: 0.6rem;
+  opacity: 0.7;
+  font-style: italic;
+}
