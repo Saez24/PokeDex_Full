@@ -1,44 +1,65 @@
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
-html {
+// Basis-Styles
+html,
+body {
   height: 100%;
-  @include mat.theme(
-    (
-      color: (
-        primary: mat.$azure-palette,
-        tertiary: mat.$blue-palette,
-      ),
-      typography: Roboto,
-      density: 0,
-    )
-  );
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light dark;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
   margin: 0;
-  height: 100%;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
 }
-/* You can add global styles to this file, and also import other style files */
 
-/* ── Füge dies in deine globale styles.scss ein ── */
+// Color-scheme für native Browser-Unterstützung
+html {
+  color-scheme: light dark;
+  scrollbar-width: thin;
+  scrollbar-color: var(--app-border) var(--app-surface);
+}
+
+// Light Theme (Standard)
+html,
+html.light-theme {
+  @include mat.theme((color: mat.$violet-palette,
+      typography: Roboto,
+      density: 0));
+}
+
+// Dark Theme
+html.dark-theme {
+  @include mat.theme((color: (theme-type: dark,
+        primary: mat.$violet-palette,
+        accent: mat.$violet-palette,
+      ),
+      typography: Roboto,
+      density: 0));
+}
+
+// Theme-spezifische Custom Properties
+html.light-theme {
+  --app-background: #ffffff;
+  --app-surface: #f5f5f5;
+  --app-text-primary: #212121;
+  --app-text-secondary: #757575;
+  --app-border: #e0e0e0;
+  --app-shadow: rgba(0, 0, 0, 0.1);
+}
+
+html.dark-theme {
+  --app-background: #121212;
+  --app-surface: #1e1e1e;
+  --app-text-primary: #ffffff;
+  --app-text-secondary: #b3b3b3;
+  --app-border: #333333;
+  --app-shadow: rgba(0, 0, 0, 0.3);
+}
+
+// Smooth transitions für Theme-Wechsel
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  border: unset;
+}
 
 /* Dialog Panel Override */
 .poke-dialog-panel {

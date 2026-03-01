@@ -1,7 +1,6 @@
 /* ── Variables ── */
 :host {
   display: block;
-  background: #000;
   min-height: 100vh;
   color: #f5f5f7;
   font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
@@ -59,7 +58,7 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 2px;
+  gap: 10px;
   padding: 8px 24px 24px;
 }
 

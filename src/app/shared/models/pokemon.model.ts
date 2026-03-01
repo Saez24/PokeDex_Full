@@ -1,35 +1,33 @@
 export interface PokemonType {
   slot: number;
-  type: {
-    name: string;
-    url: string;
-  };
+  type: { name: string; url: string };
 }
 
 export interface PokemonStat {
   base_stat: number;
   effort: number;
-  stat: {
-    name: string;
-    url: string;
-  };
+  stat: { name: string; url: string };
 }
 
 export interface PokemonAbility {
-  ability: {
-    name: string;
-    url: string;
-  };
+  ability: { name: string; url: string };
   is_hidden: boolean;
   slot: number;
 }
 
 export interface PokemonSprites {
   other: {
-    'official-artwork': {
-      front_default: string;
-    };
+    'official-artwork': { front_default: string };
   };
+}
+
+export interface PokemonMoveEntry {
+  move: { name: string; url: string };
+  version_group_details: {
+    level_learned_at: number;
+    move_learn_method: { name: string };
+    version_group: { name: string };
+  }[];
 }
 
 export interface Pokemon {
@@ -42,4 +40,5 @@ export interface Pokemon {
   stats: PokemonStat[];
   abilities: PokemonAbility[];
   sprites: PokemonSprites;
+  moves: PokemonMoveEntry[];
 }

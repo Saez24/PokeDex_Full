@@ -3,4 +3,9 @@
   <div class="nav-count">
     <strong>{{ pokemonService.total() }}</strong> Einträge geladen
   </div>
+
+  <button mat-icon-button (click)="toggleTheme()"
+        [attr.aria-label]="isDarkMode() ? 'Switch to light mode' : 'Switch to dark mode'" class="mobile-theme-toggle">
+        <mat-icon>{{ isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
 </nav>
