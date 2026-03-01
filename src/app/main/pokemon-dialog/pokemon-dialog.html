@@ -1,28 +1,51 @@
-<div class="dialog-container" [ngStyle]="{'--primary': primaryColor, '--glow': primaryGlow}">
-
+<div class="dialog-container" [ngStyle]="{ '--primary': primaryColor, '--glow': primaryGlow }">
   <!-- ── Art Header ── -->
   <div class="d-art">
     <div class="d-art-bg"></div>
     <div class="d-art-grid"></div>
-    <img class="d-sprite" [src]="spriteUrl" [alt]="pokemon.name"/>
+    <img class="d-sprite" [src]="spriteUrl" [alt]="pokemon.name" />
     <button class="d-close" (click)="close()">
-      <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-        <path d="M1 1l12 12M13 1L1 13"/>
+      <svg
+        width="11"
+        height="11"
+        viewBox="0 0 14 14"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+      >
+        <path d="M1 1l12 12M13 1L1 13" />
       </svg>
     </button>
     <div class="d-num">#{{ paddedId }}</div>
 
     <!-- Name + types overlay at bottom of art -->
     <div class="d-art-footer">
-      <div class="d-name">{{ pokemon.name }}</div>
+      @if (species()) {
+        <div class="d-name">
+          {{ pokemonService.getLocalizedName(species()) }}
+        </div>
+      }
+
       <div class="d-badges">
         @for (t of pokemon.types; track t.slot) {
-          <span class="d-badge"
-            [ngStyle]="{background: TYPE_COLORS[t.type.name] + '30', 'border-color': TYPE_COLORS[t.type.name] + '60', color: TYPE_COLORS[t.type.name]}">
+          <span
+            class="d-badge"
+            [ngStyle]="{
+              background: TYPE_COLORS[t.type.name] + '30',
+              'border-color': TYPE_COLORS[t.type.name] + '60',
+              color: TYPE_COLORS[t.type.name],
+            }"
+          >
             {{ t.type.name }}
           </span>
         }
       </div>
+      @if (species()) {
+        <p class="card-flavor">
+          {{ pokemonService.getLocalizedFlavor(species()) }}
+        </p>
+      }
     </div>
   </div>
 
@@ -32,11 +55,9 @@
     animationDuration="200ms"
     (selectedIndexChange)="onTabChange($event)"
   >
-
     <!-- ━━ TAB 1: Stats ━━ -->
     <mat-tab label="Stats">
       <div class="tab-content">
-
         <!-- Info pills -->
         <div class="info-row">
           <div class="info-pill">
@@ -60,9 +81,13 @@
             <span class="stat-label">{{ STAT_LABELS[stat.stat.name] || stat.stat.name }}</span>
             <span class="stat-val">{{ stat.base_stat }}</span>
             <div class="stat-track">
-              <div class="stat-fill"
-                [ngStyle]="{width: statPercent(stat.base_stat) + '%', background: statColor(stat.base_stat)}">
-              </div>
+              <div
+                class="stat-fill"
+                [ngStyle]="{
+                  width: statPercent(stat.base_stat) + '%',
+                  background: statColor(stat.base_stat),
+                }"
+              ></div>
             </div>
           </div>
         }
@@ -73,18 +98,18 @@
           @for (a of pokemon.abilities; track a.slot) {
             <span class="ability-chip" [class.hidden-ab]="a.is_hidden">
               {{ a.ability.name.replaceAll('-', ' ') }}
-              @if (a.is_hidden) { <span class="hidden-tag">versteckt</span> }
+              @if (a.is_hidden) {
+                <span class="hidden-tag">versteckt</span>
+              }
             </span>
           }
         </div>
-
       </div>
     </mat-tab>
 
     <!-- ━━ TAB 2: Evolution ━━ -->
     <mat-tab label="Evolution">
       <div class="tab-content">
-
         @if (evolutionLoading()) {
           <div class="loading-wrap">
             <div class="spinner"></div>
@@ -98,13 +123,18 @@
         } @else {
           <div class="evo-chain">
             @for (step of evolutionChain(); track step.id; let i = $index) {
-
               <!-- Evolution arrow (not before first) -->
               @if (i > 0) {
                 <div class="evo-arrow">
                   <div class="evo-arrow-line"></div>
                   <svg width="10" height="14" viewBox="0 0 10 14" fill="none">
-                    <path d="M1 1l8 6-8 6" stroke="rgba(245,245,247,0.3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path
+                      d="M1 1l8 6-8 6"
+                      stroke="rgba(245,245,247,0.3)"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
                   </svg>
                   @if (step.minLevel) {
                     <div class="evo-level">Lv. {{ step.minLevel }}</div>
@@ -117,23 +147,20 @@
               <!-- Pokemon step -->
               <div class="evo-step" [class.evo-active]="step.id === pokemon.id">
                 <div class="evo-img-wrap">
-                  <img class="evo-sprite" [src]="step.spriteUrl" [alt]="step.name" loading="lazy"/>
+                  <img class="evo-sprite" [src]="step.spriteUrl" [alt]="step.name" loading="lazy" />
                 </div>
                 <span class="evo-name">{{ step.name }}</span>
-                <span class="evo-id">#{{ step.id.toString().padStart(3,'0') }}</span>
+                <span class="evo-id">#{{ step.id.toString().padStart(3, '0') }}</span>
               </div>
-
             }
           </div>
         }
-
       </div>
     </mat-tab>
 
     <!-- ━━ TAB 3: Moves ━━ -->
     <mat-tab label="Moves">
       <div class="tab-content">
-
         @if (movesLoading()) {
           <div class="loading-wrap">
             <div class="spinner"></div>
@@ -145,37 +172,43 @@
             <div>Öffne den Tab um Attacken zu laden.</div>
           </div>
         } @else {
-
           <!-- Table header -->
           <div class="moves-table">
             <div class="moves-header">
               <span>Lv.</span>
               <span>Name</span>
               <span>Typ</span>
-              <span style="text-align:center">Cat.</span>
-              <span style="text-align:right">PWR</span>
-              <span style="text-align:right">ACC</span>
+              <span style="text-align: center">Cat.</span>
+              <span style="text-align: right">PWR</span>
+              <span style="text-align: right">ACC</span>
             </div>
 
             @for (move of moves(); track move.name) {
               <div class="move-row">
                 <span class="move-lv">{{ move.level || '–' }}</span>
                 <span class="move-name">{{ move.name.replaceAll('-', ' ') }}</span>
-                <span class="move-type-badge"
-                  [ngStyle]="{background: TYPE_COLORS[move.type] + '28', 'border-color': TYPE_COLORS[move.type] + '55', color: TYPE_COLORS[move.type]}">
+                <span
+                  class="move-type-badge"
+                  [ngStyle]="{
+                    background: TYPE_COLORS[move.type] + '28',
+                    'border-color': TYPE_COLORS[move.type] + '55',
+                    color: TYPE_COLORS[move.type],
+                  }"
+                >
                   {{ move.type }}
                 </span>
-                <span class="move-class" style="text-align:center">{{ damageClassIcon(move.damageClass) }}</span>
-                <span class="move-val" style="text-align:right">{{ move.power ?? '–' }}</span>
-                <span class="move-val" style="text-align:right">{{ move.accuracy ? move.accuracy + '%' : '–' }}</span>
+                <span class="move-class" style="text-align: center">{{
+                  damageClassIcon(move.damageClass)
+                }}</span>
+                <span class="move-val" style="text-align: right">{{ move.power ?? '–' }}</span>
+                <span class="move-val" style="text-align: right">{{
+                  move.accuracy ? move.accuracy + '%' : '–'
+                }}</span>
               </div>
             }
           </div>
-
         }
-
       </div>
     </mat-tab>
-
   </mat-tab-group>
 </div>

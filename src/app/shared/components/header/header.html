@@ -4,8 +4,25 @@
     <!-- <strong>{{ pokemonService.total() }}</strong> Einträge geladen -->
   </div>
 
-  <button mat-icon-button disableRipple (click)="toggleTheme()"
-        [attr.aria-label]="isDarkMode() ? 'Switch to light mode' : 'Switch to dark mode'" class="mobile-theme-toggle">
-        <mat-icon>{{ isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
-      </button>
+  <select
+    class="language-select"
+    [value]="pokemonService.language()"
+    (change)="setLanguage($event)"
+  >
+    @for (lang of languages; track lang.code) {
+      <option [value]="lang.code">
+        {{ lang.label }}
+      </option>
+    }
+  </select>
+
+  <button
+    mat-icon-button
+    disableRipple
+    (click)="toggleTheme()"
+    [attr.aria-label]="isDarkMode() ? 'Switch to light mode' : 'Switch to dark mode'"
+    class="mobile-theme-toggle"
+  >
+    <mat-icon>{{ isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
 </nav>

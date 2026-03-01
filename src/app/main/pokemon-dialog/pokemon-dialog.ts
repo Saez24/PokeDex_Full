@@ -20,6 +20,7 @@ import { Pokemon } from '../../shared/models/pokemon.model';
 import { Api } from '../../shared/services/api/api';
 import { EvolutionStep } from '../../shared/models/evolution.model';
 import { MoveRow } from '../../shared/models/move.model';
+import { PokemonService } from '../../shared/services/pokemon/pokemon';
 
 @Component({
   selector: 'app-pokemon-dialog',
@@ -32,6 +33,7 @@ export class PokemonDialog implements OnInit {
   readonly dialogRef = inject(MatDialogRef<PokemonDialog>);
   readonly pokemon: Pokemon = inject(MAT_DIALOG_DATA);
   private readonly api = inject(Api);
+  readonly pokemonService = inject(PokemonService);
 
   readonly STAT_LABELS = STAT_LABELS;
   readonly TYPE_COLORS = TYPE_COLORS;
@@ -41,11 +43,13 @@ export class PokemonDialog implements OnInit {
   moves = signal<MoveRow[]>([]);
   movesLoading = signal(false);
   evolutionLoading = signal(false);
+  species = signal<any | null>(null);
 
   /* ── Tab state ── */
   activeTab = signal(0);
 
   ngOnInit(): void {
+    this.loadSpecies();
     this.loadEvolution();
   }
 
@@ -99,6 +103,15 @@ export class PokemonDialog implements OnInit {
         error: () => this.evolutionLoading.set(false),
       });
   }
+
+  private loadSpecies(): void {
+  this.api
+    .getResource<any>('pokemon-species', undefined, String(this.pokemon.id))
+    .subscribe({
+      next: data => this.species.set(data),
+      error: () => this.species.set(null),
+    });
+}
 
   private flattenChain(link: any, steps: EvolutionStep[] = []): EvolutionStep[] {
     const id = this.idFromUrl(link.species.url);

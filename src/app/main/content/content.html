@@ -11,7 +11,7 @@
   @for (p of pokemonService.pokemon(); track trackById($index, p)) {
     <div
       class="card reveal"
-      [ngStyle]="{'--card-glow': primaryGlow(p), '--card-color': primaryColor(p)}"
+      [ngStyle]="{ '--card-glow': primaryGlow(p), '--card-color': primaryColor(p) }"
       (click)="openDialog(p)"
     >
       <!-- Top row -->
@@ -23,7 +23,7 @@
               class="type-dot"
               [ngStyle]="{
                 background: TYPE_COLORS[t.type.name],
-                'box-shadow': '0 0 6px ' + TYPE_COLORS[t.type.name]
+                'box-shadow': '0 0 6px ' + TYPE_COLORS[t.type.name],
               }"
             ></span>
           }
@@ -32,17 +32,15 @@
 
       <!-- Sprite -->
       <div class="card-art">
-        <img
-          class="card-sprite"
-          [src]="spriteUrl(p)"
-          [alt]="p.name"
-          loading="lazy"
-        />
+        <img class="card-sprite" [src]="spriteUrl(p)" [alt]="p.name" loading="lazy" />
       </div>
 
       <!-- Info -->
       <div class="card-bottom">
-        <div class="card-name">{{ p.name }}</div>
+        <!-- Deutscher / gewählter Name -->
+        <div class="card-name">{{ pokemonService.getLocalizedName(p.species) }}</div>
+
+        <!-- Gattung / Typ -->
         <div class="card-type-label">
           {{ p.types.map(t => t.type.name).join(' · ') }}
         </div>
@@ -55,7 +53,7 @@
               <div class="stat-micro-track">
                 <div
                   class="stat-micro-fill"
-                  [ngStyle]="{width: statPercent(stat.base_stat) + '%'}"
+                  [ngStyle]="{ width: statPercent(stat.base_stat) + '%' }"
                 ></div>
               </div>
             </div>
@@ -67,7 +65,7 @@
 
   <!-- Skeleton cards while loading -->
   @if (pokemonService.loading()) {
-    @for (i of [1,2,3,4,5,6,7,8]; track i) {
+    @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
       <div class="card skeleton"></div>
     }
   }
@@ -76,11 +74,7 @@
 <!-- ── Load More ── -->
 @if (pokemonService.hasMore()) {
   <div class="load-wrap">
-    <button
-      class="load-btn"
-      [disabled]="pokemonService.loading()"
-      (click)="loadMore()"
-    >
+    <button class="load-btn" [disabled]="pokemonService.loading()" (click)="loadMore()">
       @if (pokemonService.loading()) {
         <mat-spinner diameter="18" strokeWidth="2" />
       } @else {
