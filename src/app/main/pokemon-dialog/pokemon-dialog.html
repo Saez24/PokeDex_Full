@@ -37,7 +37,7 @@
               color: TYPE_COLORS[t.type.name],
             }"
           >
-            {{ t.type.name }}
+            {{ pokemonService.getLocalizedTypes(pokemon)[t.slot - 1] }}
           </span>
         }
       </div>
@@ -97,7 +97,7 @@
         <div class="abilities-wrap">
           @for (a of pokemon.abilities; track a.slot) {
             <span class="ability-chip" [class.hidden-ab]="a.is_hidden">
-              {{ a.ability.name.replaceAll('-', ' ') }}
+              {{ pokemonService.getLocalizedAbilityName(a.ability.name) }}
               @if (a.is_hidden) {
                 <span class="hidden-tag">versteckt</span>
               }
@@ -186,7 +186,11 @@
             @for (move of moves(); track move.name) {
               <div class="move-row">
                 <span class="move-lv">{{ move.level || '–' }}</span>
-                <span class="move-name">{{ move.name.replaceAll('-', ' ') }}</span>
+
+                <span class="move-name">
+                  {{ pokemonService.getLocalizedMoveName(move.name) }}
+                </span>
+
                 <span
                   class="move-type-badge"
                   [ngStyle]="{
@@ -195,15 +199,16 @@
                     color: TYPE_COLORS[move.type],
                   }"
                 >
-                  {{ move.type }}
+                  {{ pokemonService.getLocalizedTypeName(move.type) }}
                 </span>
-                <span class="move-class" style="text-align: center">{{
-                  damageClassIcon(move.damageClass)
-                }}</span>
+
+                <span class="move-class" style="text-align: center">
+                  {{ damageClassIcon(move.damageClass) }}
+                </span>
                 <span class="move-val" style="text-align: right">{{ move.power ?? '–' }}</span>
-                <span class="move-val" style="text-align: right">{{
-                  move.accuracy ? move.accuracy + '%' : '–'
-                }}</span>
+                <span class="move-val" style="text-align: right">
+                  {{ move.accuracy ? move.accuracy + '%' : '–' }}
+                </span>
               </div>
             }
           </div>

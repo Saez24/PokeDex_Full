@@ -42,7 +42,7 @@
 
         <!-- Gattung / Typ -->
         <div class="card-type-label">
-          {{ p.types.map(t => t.type.name).join(' · ') }}
+          {{ pokemonService.getLocalizedTypes(p).join(' · ') }}
         </div>
 
         <!-- Mini stat bars -->

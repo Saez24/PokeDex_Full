@@ -18,6 +18,7 @@ export class PokemonService {
   total = computed(() => this.pokemon().length);
   private _language = signal('de'); // Default Deutsch
   public language = computed(() => this._language());
+  private typeCache = new Map<string, any>();
 
   setLanguage(lang: string) {
     this._language.set(lang);
@@ -25,6 +26,69 @@ export class PokemonService {
 
   constructor() {
     this.loadMore();
+  }
+
+  getLocalizedStatName(englishStatName: string): string {
+    const statData = this.typeCache.get(englishStatName);
+    if (!statData) return englishStatName; // Fallback
+
+    const localized = statData.names.find((n: any) => n.language.name === this._language());
+    return localized?.name ?? englishStatName;
+  }
+
+  getLocalizedStats(pokemon: Pokemon): { name: string; value: number }[] {
+    return pokemon.stats.map((s) => ({
+      name: this.getLocalizedStatName(s.stat.name),
+      value: s.base_stat,
+    }));
+  }
+
+  getLocalizedMoveName(englishMoveName: string): string {
+    const moveData = this.typeCache.get(englishMoveName);
+    if (!moveData) return englishMoveName; // Fallback
+
+    const localized = moveData.names.find((n: any) => n.language.name === this._language());
+    return localized?.name ?? englishMoveName;
+  }
+
+  getLocalizedMoveNames(pokemon: Pokemon): string[] {
+    return pokemon.moves.map((m) => this.getLocalizedMoveName(m.move.name));
+  }
+
+  getLocalizedAbilityName(englishAbilityName: string): string {
+    const abilityData = this.typeCache.get(englishAbilityName);
+    if (!abilityData) return englishAbilityName; // Fallback
+
+    const localized = abilityData.names.find((n: any) => n.language.name === this._language());
+    return localized?.name ?? englishAbilityName;
+  }
+
+  getLocalizedAbilities(pokemon: Pokemon): string[] {
+    return pokemon.abilities.map((a) => this.getLocalizedAbilityName(a.ability.name));
+  }
+
+  getLocalizedMoveTypes(pokemon: Pokemon): string[] {
+    return pokemon.moves.map((m) => {
+      const moveData = this.typeCache.get(m.move.name);
+      if (!moveData) return m.move.name; // Fallback
+
+      const localized = moveData.names.find((n: any) => n.language.name === this._language());
+      return localized?.name ?? m.move.name;
+    });
+  }
+
+  // Lokalisierter Typ-Name aus dem Cache
+  getLocalizedTypeName(englishTypeName: string): string {
+    const typeData = this.typeCache.get(englishTypeName);
+    if (!typeData) return englishTypeName; // Fallback
+
+    const localized = typeData.names.find((n: any) => n.language.name === this._language());
+    return localized?.name ?? englishTypeName;
+  }
+
+  // Alle lokalisierten Typen eines Pokémon
+  getLocalizedTypes(pokemon: Pokemon): string[] {
+    return pokemon.types.map((t) => this.getLocalizedTypeName(t.type.name));
   }
 
   getLocalizedName(species: any): string {
@@ -45,9 +109,28 @@ export class PokemonService {
     return genus?.genus ?? '';
   }
 
+  getTypes(type: any): string[] {
+    return type.names
+      .map((n: any) => {
+        if (n.language.name === this._language()) return n.name;
+        return null;
+      })
+      .filter((n: any) => n !== null);
+  }
+
+  loadMovesForPokemon(moveNames: string[]): void {
+    const uncached = moveNames.filter((n) => !this.typeCache.has(n));
+    if (!uncached.length) return;
+
+    forkJoin(uncached.map((n) => this.api.getResource<any>('move', undefined, n))).subscribe(
+      (details) => {
+        uncached.forEach((name, i) => this.typeCache.set(name, details[i]));
+      },
+    );
+  }
+
   loadMore(): void {
     if (this.loading() || !this.hasMore()) return;
-
     this.loading.set(true);
 
     this.api
@@ -59,21 +142,60 @@ export class PokemonService {
 
         forkJoin(
           response.results.map((p) =>
-            // Hol Basisdaten + species
             forkJoin({
               base: this.api.getResource<Pokemon>('pokemon', undefined, p.name),
               species: this.api.getResource<any>('pokemon-species', undefined, p.name),
             }),
           ),
         ).subscribe((results) => {
-          const enriched = results.map((r) => ({
-            ...r.base,
-            species: r.species,
-          }));
+          // Einzigartige Typen + Abilities sammeln
+          const uniqueTypeNames = [
+            ...new Set(results.flatMap((r) => r.base.types.map((t: any) => t.type.name))),
+          ];
+          const uniqueAbilityNames = [
+            ...new Set(results.flatMap((r) => r.base.abilities.map((a: any) => a.ability.name))),
+          ];
 
-          this.pokemon.update((prev) => [...prev, ...enriched]);
-          this.offset.update((v) => v + this.PAGE_SIZE);
-          this.loading.set(false);
+          const uniqueMoveNames = [
+            ...new Set(results.flatMap((r) => r.base.moves.map((m: any) => m.move.name))),
+          ];
+
+          // Nur uncached laden
+          const uncachedTypes = uniqueTypeNames.filter((n) => !this.typeCache.has(n));
+          const uncachedAbilities = uniqueAbilityNames.filter((n) => !this.typeCache.has(n));
+          const uncachedMoves = uniqueMoveNames.filter((n) => !this.typeCache.has(n));
+          const allUncached = [...uncachedTypes, ...uncachedAbilities];
+
+          const finalize = () => {
+            const enriched = results.map((r) => ({ ...r.base, species: r.species }));
+            this.pokemon.update((prev) => [...prev, ...enriched]);
+            this.offset.update((v) => v + this.PAGE_SIZE);
+            this.loading.set(false);
+          };
+
+          if (allUncached.length === 0) {
+            finalize();
+            return;
+          }
+
+          forkJoin([
+            ...uncachedTypes.map((n) => this.api.getResource<any>('type', undefined, n)),
+            ...uncachedAbilities.map((n) => this.api.getResource<any>('ability', undefined, n)),
+            ...uncachedMoves.map((n) => this.api.getResource<any>('move', undefined, n)),
+          ]).subscribe((details) => {
+            // Erst die Typen, dann die Abilities in den Cache schreiben
+            uncachedTypes.forEach((name, i) => this.typeCache.set(name, details[i]));
+            uncachedAbilities.forEach((name, i) =>
+              this.typeCache.set(name, details[uncachedTypes.length + i]),
+            );
+            uncachedMoves.forEach((name, i) =>
+              this.typeCache.set(
+                name,
+                details[uncachedTypes.length + uncachedAbilities.length + i],
+              ),
+            );
+            finalize();
+          });
         });
       });
   }
