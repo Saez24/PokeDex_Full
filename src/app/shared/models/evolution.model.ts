@@ -46,6 +46,7 @@ export interface PokemonSpecies {
 export interface EvolutionStep {
   id: number;
   name: string;
+  localizedName: string;
   spriteUrl: string;
   trigger: string | null;
   minLevel: number | null;

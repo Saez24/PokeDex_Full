@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@ang
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
 import { NgStyle } from '@angular/common';
-import { forkJoin, switchMap } from 'rxjs';
+import { forkJoin, map, switchMap } from 'rxjs';
 
 import {
   getPrimaryColor,
@@ -90,7 +90,13 @@ export class PokemonDialog implements OnInit {
     return parseInt(parts[parts.length - 1], 10);
   }
 
-  /* ── Evolution loading ── */
+  private loadSpecies(): void {
+    this.api.getResource<any>('pokemon-species', undefined, String(this.pokemon.id)).subscribe({
+      next: (data) => this.species.set(data),
+      error: () => this.species.set(null),
+    });
+  }
+
   private loadEvolution(): void {
     this.evolutionLoading.set(true);
 
@@ -101,24 +107,39 @@ export class PokemonDialog implements OnInit {
           const chainId = species.evolution_chain.url.replace(/\/$/, '').split('/').pop();
           return this.api.getResource<any>('evolution-chain', undefined, chainId);
         }),
+        // Alle Steps aus der Chain extrahieren
+        switchMap((chain) => {
+          const rawSteps = this.flattenChainRaw(chain.chain);
+
+          // Species für jeden Step laden (für lokalisierte Namen)
+          return forkJoin(
+            rawSteps.map((step) =>
+              this.api.getResource<any>('pokemon-species', undefined, String(step.id)),
+            ),
+          ).pipe(
+            map((speciesResults) =>
+              rawSteps.map((step, i) => ({
+                ...step,
+                localizedName: this.pokemonService.getLocalizedName(speciesResults[i]),
+              })),
+            ),
+          );
+        }),
       )
       .subscribe({
-        next: (chain) => {
-          this.evolutionChain.set(this.flattenChain(chain.chain));
+        next: (steps) => {
+          this.evolutionChain.set(steps);
           this.evolutionLoading.set(false);
         },
         error: () => this.evolutionLoading.set(false),
       });
   }
 
-  private loadSpecies(): void {
-    this.api.getResource<any>('pokemon-species', undefined, String(this.pokemon.id)).subscribe({
-      next: (data) => this.species.set(data),
-      error: () => this.species.set(null),
-    });
-  }
-
-  private flattenChain(link: any, steps: EvolutionStep[] = []): EvolutionStep[] {
+  // Rohkette ohne lokalisierung (nur IDs + Trigger)
+  private flattenChainRaw(
+    link: any,
+    steps: Omit<EvolutionStep, 'localizedName'>[] = [],
+  ): Omit<EvolutionStep, 'localizedName'>[] {
     const id = this.idFromUrl(link.species.url);
     const detail = link.evolution_details?.[0];
 
@@ -131,11 +152,10 @@ export class PokemonDialog implements OnInit {
     });
 
     if (link.evolves_to?.length) {
-      this.flattenChain(link.evolves_to[0], steps);
+      this.flattenChainRaw(link.evolves_to[0], steps);
     }
     return steps;
   }
-
   /* ── Moves loading ── */
   private loadMoves(): void {
     this.movesLoading.set(true);

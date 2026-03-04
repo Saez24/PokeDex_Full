@@ -147,9 +147,14 @@
               <!-- Pokemon step -->
               <div class="evo-step" [class.evo-active]="step.id === pokemon.id">
                 <div class="evo-img-wrap">
-                  <img class="evo-sprite" [src]="step.spriteUrl" [alt]="step.name" loading="lazy" />
+                  <img
+                    class="evo-sprite"
+                    [src]="step.spriteUrl"
+                    [alt]="step.localizedName"
+                    loading="lazy"
+                  />
                 </div>
-                <span class="evo-name">{{ step.name }}</span>
+                <span class="evo-name">{{ step.localizedName }}</span>
                 <span class="evo-id">#{{ step.id.toString().padStart(3, '0') }}</span>
               </div>
             }

@@ -4,7 +4,12 @@
     <!-- <strong>{{ pokemonService.total() }}</strong> Einträge geladen -->
   </div>
 
-  <select class="language-select" [value]="currentLang" (change)="setLanguage($event)">
+  <select
+    id="language-select"
+    class="language-select"
+    [value]="currentLang"
+    (change)="setLanguage($event)"
+  >
     @for (lang of languages; track lang.code) {
       <option [value]="lang.code">{{ lang.label }}</option>
     }
