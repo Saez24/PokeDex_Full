@@ -148,7 +148,6 @@ export class PokemonService {
             }),
           ),
         ).subscribe((results) => {
-          // Einzigartige Typen + Abilities sammeln
           const uniqueTypeNames = [
             ...new Set(results.flatMap((r) => r.base.types.map((t: any) => t.type.name))),
           ];
@@ -156,14 +155,8 @@ export class PokemonService {
             ...new Set(results.flatMap((r) => r.base.abilities.map((a: any) => a.ability.name))),
           ];
 
-          const uniqueMoveNames = [
-            ...new Set(results.flatMap((r) => r.base.moves.map((m: any) => m.move.name))),
-          ];
-
-          // Nur uncached laden
           const uncachedTypes = uniqueTypeNames.filter((n) => !this.typeCache.has(n));
           const uncachedAbilities = uniqueAbilityNames.filter((n) => !this.typeCache.has(n));
-          const uncachedMoves = uniqueMoveNames.filter((n) => !this.typeCache.has(n));
           const allUncached = [...uncachedTypes, ...uncachedAbilities];
 
           const finalize = () => {
@@ -181,18 +174,10 @@ export class PokemonService {
           forkJoin([
             ...uncachedTypes.map((n) => this.api.getResource<any>('type', undefined, n)),
             ...uncachedAbilities.map((n) => this.api.getResource<any>('ability', undefined, n)),
-            ...uncachedMoves.map((n) => this.api.getResource<any>('move', undefined, n)),
           ]).subscribe((details) => {
-            // Erst die Typen, dann die Abilities in den Cache schreiben
             uncachedTypes.forEach((name, i) => this.typeCache.set(name, details[i]));
             uncachedAbilities.forEach((name, i) =>
               this.typeCache.set(name, details[uncachedTypes.length + i]),
-            );
-            uncachedMoves.forEach((name, i) =>
-              this.typeCache.set(
-                name,
-                details[uncachedTypes.length + uncachedAbilities.length + i],
-              ),
             );
             finalize();
           });

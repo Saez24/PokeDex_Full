@@ -7,13 +7,12 @@ import { PokeEndpoint } from '../../models/poke-endpoint.type';
 })
 export class Api {
   private http = inject(HttpClient);
-  private apiUrl = 'https://pokeapi.co/api/v2/';
-
+  private apiUrl = 'http://localhost:8000/api/v2/';
 
   getResource<T>(endpoint: PokeEndpoint, query?: string, slug?: string) {
-  let url = `${this.apiUrl}${endpoint}`;
-  if (slug) url += `/${slug}`;
-  if (query) url += `?${query}`;
-  return this.http.get<T>(url);
-}
+    let url = `${this.apiUrl}${endpoint}`;
+    if (slug) url += `/${slug}`;
+    if (query) url += `?${query}`;
+    return this.http.get<T>(url);
+  }
 }

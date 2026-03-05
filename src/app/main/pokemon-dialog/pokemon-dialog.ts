@@ -44,13 +44,18 @@ export class PokemonDialog implements OnInit {
 
   ngOnInit(): void {
     this.loadSpecies();
-    this.loadEvolution();
   }
 
   onTabChange(index: number): void {
     this.activeTab.set(index);
+
+    // Evolution lazy laden beim ersten Klick
+    if (index === 1 && this.evolutionChain().length === 0) {
+      this.loadEvolution();
+    }
+
+    // Moves lazy laden beim ersten Klick
     if (index === 2 && this.moves().length === 0) {
-      // Zuerst Move-Daten in den Cache laden, dann die Rows bauen
       this.pokemonService.loadMovesForPokemon(
         this.pokemon.moves.map((m) => m.move.name).slice(0, 20),
       );
