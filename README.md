@@ -61,7 +61,6 @@ pokedex_backend/
 ├── alembic/
 │   ├── env.py
 │   └── versions/
-├── docker-compose.yml          # Redis container
 ├── requirements.txt
 └── .env
 ```
@@ -158,6 +157,9 @@ REDIS_URL=redis://localhost:6379
 
 # Comma-separated list of allowed CORS origins
 ALLOWED_HOSTS=http://localhost:4200
+
+# Secret for admin endpoints (POST /admin/seed etc.)
+ADMIN_SECRET=secret
 ```
 
 | Variable | Required | Default | Description |
