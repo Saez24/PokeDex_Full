@@ -3,7 +3,7 @@ name: Publish Pokedex API Backend Image
 on:
   push:
     branches:
-      - main # Nur bei Push auf main
+      - production # Nur bei Push auf production
     tags:
       - "v*"
     paths:
