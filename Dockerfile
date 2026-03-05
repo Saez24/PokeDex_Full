@@ -21,8 +21,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
     pip install --no-cache-dir gunicorn
 
-COPY update-deps.sh /app/update-deps.sh
-RUN chmod +x /app/update-deps.sh    
+COPY update-deps.sh /update-deps.sh
+RUN chmod +x /update-deps.sh    
 
 # Runtime Stage
 FROM python:3.14-slim-bookworm
@@ -51,8 +51,8 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # App-Code kopieren
 COPY . .
 
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 
 EXPOSE 8000
@@ -62,4 +62,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Production-Start mit Gunicorn + Uvicorn workers
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
