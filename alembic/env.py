@@ -1,28 +1,27 @@
-from logging.config import fileConfig
+from sqlalchemy import create_engine
+from alembic import context
+from app.db.base import Base
 import os
 from dotenv import load_dotenv
 
-from sqlalchemy import engine_from_config, pool
-from alembic import context
-
-from app.db.base import Base  # ✅ Base importieren
-import app.models  # ✅ Alle Models importieren, registriert sie bei Base
-
 load_dotenv()
 
-config = context.config
+DATABASE_URL = os.getenv("DATABASE_URL").replace("+asyncpg", "")
 
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+config = context.config
+config.set_main_option("sqlalchemy.url", DATABASE_URL)
+
+from app.models.cache import (  # noqa
+    CachedPokemon, CachedSpecies, CachedEvolutionChain,
+    CachedType, CachedAbility, CachedMove, SeedProgress,
+)
 
 target_metadata = Base.metadata
 
-config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL"))
 
 def run_migrations_offline():
-    url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=url,
+        url=DATABASE_URL,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -30,16 +29,14 @@ def run_migrations_offline():
     with context.begin_transaction():
         context.run_migrations()
 
+
 def run_migrations_online():
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    connectable = create_engine(DATABASE_URL)
     with connectable.connect() as connection:
         context.configure(connection=connection, target_metadata=target_metadata)
         with context.begin_transaction():
             context.run_migrations()
+
 
 if context.is_offline_mode():
     run_migrations_offline()

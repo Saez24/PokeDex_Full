@@ -1,10 +1,33 @@
 from fastapi import FastAPI
-from app.db.session import engine
-from app.db.base import Base
-from app.api import pokemon
+from fastapi.middleware.cors import CORSMiddleware
+import os
+from dotenv import load_dotenv
+from app.api.pokemon import router
+from app.models import cache
 
-Base.metadata.create_all(bind=engine)
+load_dotenv()
 
-app = FastAPI()
+app = FastAPI(
+    title="Pokédex API",
+    description="Caching-Proxy für die PokéAPI — 100% kompatibles JSON-Format",
+    version="1.0.0",
+)
 
-app.include_router(pokemon.router, prefix="/api/v2")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        origin.strip()
+        for origin in os.getenv("ALLOWED_HOSTS", "http://localhost:4200").split(",")
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
+
+app.include_router(router, prefix="/api/v2")
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
