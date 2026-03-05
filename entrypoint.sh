@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 exec gunicorn app.main:app \
     --workers 4 \
