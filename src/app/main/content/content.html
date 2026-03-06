@@ -2,8 +2,8 @@
 <section class="hero reveal">
   <div class="hero-glow"></div>
   <div class="hero-eyebrow">Nationale Dex</div>
-  <h1 class="hero-title">Alle Pokémon.<br />Auf einen Blick.</h1>
-  <p class="hero-sub">Entdecke und erforsche die gesamte Pokémon-Welt.</p>
+  <h1 id="hero-title" i18n class="hero-title">All Pokémon.<br />In one place.</h1>
+  <p id="hero-sub" i18n class="hero-sub">Discover and explore the entire Pokémon world.</p>
 </section>
 
 <!-- ── Grid ── -->
@@ -78,9 +78,9 @@
       @if (pokemonService.loading()) {
         <mat-spinner diameter="18" strokeWidth="2" />
       } @else {
-        Weitere laden
+        Load More
       }
     </button>
-    <span class="load-hint">20 weitere Pokémon</span>
+    <span id="load-hint" i18n class="load-hint">Load 20 more Pokémon</span>
   </div>
 }

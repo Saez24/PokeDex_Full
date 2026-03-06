@@ -9,6 +9,7 @@ export interface PokemonMoveEntry {
 
 export interface MoveDetail {
   name: string;
+  url: string;
   power: number | null;
   accuracy: number | null;
   pp: number | null;
@@ -19,6 +20,7 @@ export interface MoveDetail {
 
 export interface MoveRow {
   name: string;
+  url: string;
   level: number;
   type: string;
   power: number | null;

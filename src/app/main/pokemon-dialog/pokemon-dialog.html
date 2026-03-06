@@ -61,21 +61,21 @@
         <!-- Info pills -->
         <div class="info-row">
           <div class="info-pill">
-            <div class="info-pill-label">Größe</div>
+            <div i18n class="info-pill-label">Height</div>
             <div class="info-pill-value">{{ (pokemon.height / 10).toFixed(1) }} m</div>
           </div>
           <div class="info-pill">
-            <div class="info-pill-label">Gewicht</div>
+            <div i18n class="info-pill-label">Weight</div>
             <div class="info-pill-value">{{ (pokemon.weight / 10).toFixed(1) }} kg</div>
           </div>
           <div class="info-pill">
-            <div class="info-pill-label">Basis-Exp</div>
+            <div i18n class="info-pill-label">Base-Exp</div>
             <div class="info-pill-value">{{ pokemon.base_experience }}</div>
           </div>
         </div>
 
         <!-- Stat bars -->
-        <div class="section-title">Basiswerte</div>
+        <div i18n class="section-title">Base Stats</div>
         @for (stat of pokemon.stats; track stat.stat.name) {
           <div class="stat-row">
             <span class="stat-label">{{ STAT_LABELS[stat.stat.name] || stat.stat.name }}</span>
@@ -93,13 +93,13 @@
         }
 
         <!-- Abilities -->
-        <div class="section-title" style="margin-top: 20px">Fähigkeiten</div>
+        <div i18n class="section-title" style="margin-top: 20px">Abilities</div>
         <div class="abilities-wrap">
           @for (a of pokemon.abilities; track a.slot) {
             <span class="ability-chip" [class.hidden-ab]="a.is_hidden">
               {{ pokemonService.getLocalizedAbilityName(a.ability.name) }}
               @if (a.is_hidden) {
-                <span class="hidden-tag">versteckt</span>
+                <span class="hidden-tag" i18n>hidden</span>
               }
             </span>
           }
@@ -113,12 +113,12 @@
         @if (evolutionLoading()) {
           <div class="loading-wrap">
             <div class="spinner"></div>
-            <span>Lade Evolution …</span>
+            <span i18n>Load Evolution …</span>
           </div>
         } @else if (evolutionChain().length <= 1) {
           <div class="empty-state">
             <div class="empty-icon">🔬</div>
-            <div>Dieses Pokémon entwickelt sich nicht weiter.</div>
+            <div i18n>This Pokémon does not evolve.</div>
           </div>
         } @else {
           <div class="evo-chain">
@@ -169,23 +169,23 @@
         @if (movesLoading()) {
           <div class="loading-wrap">
             <div class="spinner"></div>
-            <span>Lade Attacken …</span>
+            <span i18n>Load Moves …</span>
           </div>
         } @else if (moves().length === 0 && !movesLoading()) {
           <div class="empty-state">
             <div class="empty-icon">⚔️</div>
-            <div>Öffne den Tab um Attacken zu laden.</div>
+            <div i18n>Open the tab to load moves.</div>
           </div>
         } @else {
           <!-- Table header -->
           <div class="moves-table">
             <div class="moves-header">
-              <span>Lv.</span>
-              <span>Name</span>
-              <span>Typ</span>
-              <span style="text-align: center">Cat.</span>
-              <span style="text-align: right">PWR</span>
-              <span style="text-align: right">ACC</span>
+              <span i18n>Level</span>
+              <span i18n>Name</span>
+              <span i18n>Type</span>
+              <span i18n style="text-align: center">Category</span>
+              <span i18n style="text-align: right">Power</span>
+              <span i18n style="text-align: right">ACC</span>
             </div>
 
             @for (move of moves(); track move.name) {

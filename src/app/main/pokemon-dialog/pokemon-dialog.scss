@@ -388,7 +388,7 @@
 
 .moves-header {
   display: grid;
-  grid-template-columns: 28px 1fr 64px 28px 36px 40px;
+  grid-template-columns: 28px 1fr 42px 72px 36px 40px;
   gap: 8px;
   align-items: center;
   padding: 0 8px 8px;
@@ -403,7 +403,7 @@
 
 .move-row {
   display: grid;
-  grid-template-columns: 28px 1fr 64px 28px 36px 40px;
+  grid-template-columns: 28px 1fr 64px 60px 32px 52px;
   gap: 8px;
   align-items: center;
   padding: 9px 8px;

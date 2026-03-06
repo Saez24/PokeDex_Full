@@ -191,6 +191,7 @@ export class PokemonDialog implements OnInit {
         this.moves.set(
           details.map((d, i) => ({
             name: d.name,
+            url: d.url,
             level: levelUpMoves[i]!.level,
             type: d.type.name,
             power: d.power,
@@ -199,6 +200,8 @@ export class PokemonDialog implements OnInit {
             damageClass: d.damage_class.name,
           })),
         );
+        console.log(details);
+        
         this.movesLoading.set(false);
       },
       error: () => this.movesLoading.set(false),
