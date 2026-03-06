@@ -34,10 +34,11 @@ export class PokemonDialog implements OnInit {
 
   /* ── Signals ── */
   evolutionChain = signal<EvolutionStep[]>([]);
-  moves = signal<MoveRow[]>([]);
-  movesLoading = signal(false);
+  moves          = signal<MoveRow[]>([]);
+  movesLoading   = signal(false);
   evolutionLoading = signal(false);
-  species = signal<any | null>(null);
+  species        = signal<any | null>(null);
+  selectedMove   = signal<MoveRow | null>(null);  // aufgeklappter Move
 
   /* ── Tab state ── */
   activeTab = signal(0);
@@ -48,13 +49,11 @@ export class PokemonDialog implements OnInit {
 
   onTabChange(index: number): void {
     this.activeTab.set(index);
+    this.selectedMove.set(null); // Panel schließen beim Tab-Wechsel
 
-    // Evolution lazy laden beim ersten Klick
     if (index === 1 && this.evolutionChain().length === 0) {
       this.loadEvolution();
     }
-
-    // Moves lazy laden beim ersten Klick
     if (index === 2 && this.moves().length === 0) {
       this.pokemonService.loadMovesForPokemon(
         this.pokemon.moves.map((m) => m.move.name).slice(0, 20),
@@ -63,26 +62,23 @@ export class PokemonDialog implements OnInit {
     }
   }
 
-  /* ── Getters ── */
-  get primaryColor(): string {
-    return getPrimaryColor(this.pokemon.types);
-  }
-  get primaryGlow(): string {
-    return getPrimaryGlow(this.pokemon.types);
-  }
-  get spriteUrl(): string {
-    return this.pokemon.sprites.other['official-artwork'].front_default;
-  }
-  get paddedId(): string {
-    return String(this.pokemon.id).padStart(3, '0');
+  /* ── Move selection ── */
+  toggleMove(move: MoveRow): void {
+    this.selectedMove.update(current =>
+      current?.name === move.name ? null : move
+    );
   }
 
-  statPercent(value: number): number {
-    return Math.min((value / 160) * 100, 100);
-  }
+  /* ── Getters ── */
+  get primaryColor(): string { return getPrimaryColor(this.pokemon.types); }
+  get primaryGlow(): string  { return getPrimaryGlow(this.pokemon.types); }
+  get spriteUrl(): string    { return this.pokemon.sprites.other['official-artwork'].front_default; }
+  get paddedId(): string     { return String(this.pokemon.id).padStart(3, '0'); }
+
+  statPercent(value: number): number { return Math.min((value / 160) * 100, 100); }
   statColor(value: number): string {
     if (value >= 100) return '#30d158';
-    if (value >= 70) return '#ffd60a';
+    if (value >= 70)  return '#ffd60a';
     return this.primaryColor;
   }
 
@@ -104,7 +100,6 @@ export class PokemonDialog implements OnInit {
 
   private loadEvolution(): void {
     this.evolutionLoading.set(true);
-
     this.api
       .getResource<any>('pokemon-species', undefined, String(this.pokemon.id))
       .pipe(
@@ -112,11 +107,8 @@ export class PokemonDialog implements OnInit {
           const chainId = species.evolution_chain.url.replace(/\/$/, '').split('/').pop();
           return this.api.getResource<any>('evolution-chain', undefined, chainId);
         }),
-        // Alle Steps aus der Chain extrahieren
         switchMap((chain) => {
           const rawSteps = this.flattenChainRaw(chain.chain);
-
-          // Species für jeden Step laden (für lokalisierte Namen)
           return forkJoin(
             rawSteps.map((step) =>
               this.api.getResource<any>('pokemon-species', undefined, String(step.id)),
@@ -140,14 +132,12 @@ export class PokemonDialog implements OnInit {
       });
   }
 
-  // Rohkette ohne lokalisierung (nur IDs + Trigger)
   private flattenChainRaw(
     link: any,
     steps: Omit<EvolutionStep, 'localizedName'>[] = [],
   ): Omit<EvolutionStep, 'localizedName'>[] {
     const id = this.idFromUrl(link.species.url);
     const detail = link.evolution_details?.[0];
-
     steps.push({
       id,
       name: link.species.name,
@@ -155,17 +145,17 @@ export class PokemonDialog implements OnInit {
       trigger: detail?.trigger?.name ?? null,
       minLevel: detail?.min_level ?? null,
     });
-
     if (link.evolves_to?.length) {
       this.flattenChainRaw(link.evolves_to[0], steps);
     }
     return steps;
   }
-  /* ── Moves loading ── */
+
   private loadMoves(): void {
     this.movesLoading.set(true);
 
-    // Get level-up moves from latest version group, sorted by level
+    const lang = this.pokemonService.language();
+
     const levelUpMoves = this.pokemon.moves
       .map((entry) => {
         const detail = entry.version_group_details
@@ -177,7 +167,7 @@ export class PokemonDialog implements OnInit {
       })
       .filter(Boolean)
       .sort((a, b) => a!.level - b!.level)
-      .slice(0, 20); // max 20 for performance
+      .slice(0, 20);
 
     if (!levelUpMoves.length) {
       this.movesLoading.set(false);
@@ -189,19 +179,24 @@ export class PokemonDialog implements OnInit {
     ).subscribe({
       next: (details) => {
         this.moves.set(
-          details.map((d, i) => ({
-            name: d.name,
-            url: d.url,
-            level: levelUpMoves[i]!.level,
-            type: d.type.name,
-            power: d.power,
-            accuracy: d.accuracy,
-            pp: d.pp,
-            damageClass: d.damage_class.name,
-          })),
+          details.map((d, i) => {
+            // Lokalisierter Effekttext
+            const effectEntry =
+              d.effect_entries?.find((e: any) => e.language.name === lang) ??
+              d.effect_entries?.find((e: any) => e.language.name === 'en');
+
+            return {
+              name: d.name,
+              level: levelUpMoves[i]!.level,
+              type: d.type.name,
+              power: d.power,
+              accuracy: d.accuracy,
+              pp: d.pp,
+              damageClass: d.damage_class.name,
+              effect: effectEntry?.short_effect ?? null,
+            };
+          }),
         );
-        console.log(details);
-        
         this.movesLoading.set(false);
       },
       error: () => this.movesLoading.set(false),
@@ -211,8 +206,8 @@ export class PokemonDialog implements OnInit {
   damageClassIcon(cls: string): string {
     const map: Record<string, string> = {
       physical: '⚔️',
-      special: '✨',
-      status: '💫',
+      special:  '✨',
+      status:   '💫',
     };
     return map[cls] ?? '–';
   }

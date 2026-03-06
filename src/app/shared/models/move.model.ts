@@ -7,6 +7,17 @@ export interface PokemonMoveEntry {
   }[];
 }
 
+export interface MoveRow {
+  name: string;
+  level: number;
+  type: string;
+  power: number | null;
+  accuracy: number | null;
+  pp: number | null;
+  damageClass: string;
+  effect: string | null; // lokalisierter Effekttext
+}
+
 export interface MoveDetail {
   name: string;
   url: string;
@@ -16,15 +27,4 @@ export interface MoveDetail {
   type: { name: string };
   damage_class: { name: string };
   effect_entries: { short_effect: string; language: { name: string } }[];
-}
-
-export interface MoveRow {
-  name: string;
-  url: string;
-  level: number;
-  type: string;
-  power: number | null;
-  accuracy: number | null;
-  pp: number | null;
-  damageClass: string;
 }

@@ -109,6 +109,14 @@ export class PokemonService {
     return genus?.genus ?? '';
   }
 
+  getLocalizedMoveEffect(moveData: any): string {
+    const lang = this._language();
+    const effectEntry =
+      moveData.effect_entries?.find((e: any) => e.language.name === lang) ??
+      moveData.effect_entries?.find((e: any) => e.language.name === 'en');
+    return effectEntry?.short_effect ?? '';
+  }
+
   getTypes(type: any): string[] {
     return type.names
       .map((n: any) => {

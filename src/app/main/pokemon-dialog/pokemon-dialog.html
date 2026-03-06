@@ -164,61 +164,114 @@
     </mat-tab>
 
     <!-- ━━ TAB 3: Moves ━━ -->
-    <mat-tab label="Moves">
-      <div class="tab-content">
-        @if (movesLoading()) {
-          <div class="loading-wrap">
-            <div class="spinner"></div>
-            <span i18n>Load Moves …</span>
+<mat-tab label="Moves">
+  <div class="tab-content">
+
+    @if (movesLoading()) {
+      <div class="loading-wrap">
+        <div class="spinner"></div>
+        <span>Lade Attacken …</span>
+      </div>
+
+    } @else if (moves().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">⚔️</div>
+        <div>Öffne den Tab um Attacken zu laden.</div>
+      </div>
+
+    } @else {
+      <div class="moves-table">
+
+        <!-- Header -->
+        <div class="moves-header">
+          <span>Lv.</span>
+          <span>Name</span>
+          <span>Typ</span>
+          <span style="text-align:center">Cat.</span>
+          <span style="text-align:right">PWR</span>
+          <span style="text-align:right">ACC</span>
+        </div>
+
+        @for (move of moves(); track move.name) {
+
+          <!-- ── Move Row ── -->
+          <div
+            class="move-row"
+            [class.move-row--active]="selectedMove()?.name === move.name"
+            (click)="toggleMove(move)"
+            role="button"
+            [attr.aria-expanded]="selectedMove()?.name === move.name"
+          >
+            <span class="move-lv">{{ move.level || '–' }}</span>
+
+            <span class="move-name">
+              {{ pokemonService.getLocalizedMoveName(move.name) }}
+            </span>
+
+            <span class="move-type-badge"
+              [ngStyle]="{
+                background: TYPE_COLORS[move.type] + '28',
+                'border-color': TYPE_COLORS[move.type] + '55',
+                color: TYPE_COLORS[move.type]
+              }">
+              {{ pokemonService.getLocalizedTypeName(move.type) }}
+            </span>
+
+            <span class="move-class" style="text-align:center">
+              {{ damageClassIcon(move.damageClass) }}
+            </span>
+            <span class="move-val" style="text-align:right">{{ move.power ?? '–' }}</span>
+            <span class="move-val" style="text-align:right">
+              {{ move.accuracy ? move.accuracy + '%' : '–' }}
+            </span>
           </div>
-        } @else if (moves().length === 0 && !movesLoading()) {
-          <div class="empty-state">
-            <div class="empty-icon">⚔️</div>
-            <div i18n>Open the tab to load moves.</div>
-          </div>
-        } @else {
-          <!-- Table header -->
-          <div class="moves-table">
-            <div class="moves-header">
-              <span i18n>Level</span>
-              <span i18n>Name</span>
-              <span i18n>Type</span>
-              <span i18n style="text-align: center">Category</span>
-              <span i18n style="text-align: right">Power</span>
-              <span i18n style="text-align: right">ACC</span>
-            </div>
 
-            @for (move of moves(); track move.name) {
-              <div class="move-row">
-                <span class="move-lv">{{ move.level || '–' }}</span>
+          <!-- ── Detail Panel (aufklappbar) ── -->
+          @if (selectedMove()?.name === move.name) {
+            <div class="move-detail-panel"
+              [ngStyle]="{'border-color': TYPE_COLORS[move.type] + '40'}">
 
-                <span class="move-name">
-                  {{ pokemonService.getLocalizedMoveName(move.name) }}
-                </span>
-
-                <span
-                  class="move-type-badge"
-                  [ngStyle]="{
-                    background: TYPE_COLORS[move.type] + '28',
-                    'border-color': TYPE_COLORS[move.type] + '55',
-                    color: TYPE_COLORS[move.type],
-                  }"
-                >
-                  {{ pokemonService.getLocalizedTypeName(move.type) }}
-                </span>
-
-                <span class="move-class" style="text-align: center">
-                  {{ damageClassIcon(move.damageClass) }}
-                </span>
-                <span class="move-val" style="text-align: right">{{ move.power ?? '–' }}</span>
-                <span class="move-val" style="text-align: right">
-                  {{ move.accuracy ? move.accuracy + '%' : '–' }}
-                </span>
+              <!-- Stat pills -->
+              <div class="move-detail-stats">
+                <div class="move-detail-pill">
+                  <span class="move-detail-pill-label">PP</span>
+                  <span class="move-detail-pill-value">{{ move.pp ?? '–' }}</span>
+                </div>
+                <div class="move-detail-pill">
+                  <span class="move-detail-pill-label">Power</span>
+                  <span class="move-detail-pill-value">{{ move.power ?? '–' }}</span>
+                </div>
+                <div class="move-detail-pill">
+                  <span class="move-detail-pill-label">Accuracy</span>
+                  <span class="move-detail-pill-value">
+                    {{ move.accuracy ? move.accuracy + '%' : '–' }}
+                  </span>
+                </div>
+                <div class="move-detail-pill">
+                  <span class="move-detail-pill-label">Category</span>
+                  <span class="move-detail-pill-value" style="text-transform:capitalize">
+                    {{ damageClassIcon(move.damageClass) }} {{ move.damageClass }}
+                  </span>
+                </div>
               </div>
-            }
-          </div>
+
+              <!-- Effektbeschreibung -->
+              @if (move.effect) {
+                <p class="move-detail-effect">{{ move.effect }}</p>
+              } @else {
+                <p i18n class="move-detail-effect move-detail-effect--empty">
+                  No additional effect information available.
+                </p>
+              }
+
+            </div>
+          }
+
         }
       </div>
-    </mat-tab>
+    }
+
+  </div>
+</mat-tab>
   </mat-tab-group>
 </div>
