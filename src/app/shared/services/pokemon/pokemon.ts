@@ -16,7 +16,7 @@ export class PokemonService {
   offset = signal(0);
   hasMore = signal(true);
   total = computed(() => this.pokemon().length);
-  private _language = signal('de'); // Default Deutsch
+  private _language = signal('en');
   public language = computed(() => this._language());
   private typeCache = new Map<string, any>();
 
