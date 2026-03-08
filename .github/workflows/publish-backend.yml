@@ -7,7 +7,7 @@ on:
     tags:
       - "v*"
     paths:
-      - "/**" # Nur wenn sich Backend-Code ändert
+      - "**" # Nur wenn sich Backend-Code ändert
       - ".github/workflows/publish-backend.yml"
 
 permissions:
