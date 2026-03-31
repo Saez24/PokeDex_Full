@@ -23,10 +23,6 @@ export class Header {
     { code: 'it', label: 'Italiano' },
     { code: 'ja', label: '日本語' },
     { code: 'ko', label: '한국어' },
-    { code: 'pt', label: 'Português' },
-    { code: 'ru', label: 'Русский' },
-    { code: 'tr', label: 'Türkçe' },
-    // ...alle Sprachen aus Pokémon-API hinzufügen
   ];
 
   currentLang = 'en';
