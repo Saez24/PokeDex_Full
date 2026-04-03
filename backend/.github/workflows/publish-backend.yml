@@ -1,0 +1,49 @@
+name: Publish Pokedex API Backend Image
+
+on:
+  push:
+    branches:
+      - production # Nur bei Push auf production
+    tags:
+      - "v*"
+    paths:
+      - "**" # Nur wenn sich Backend-Code ändert
+      - ".github/workflows/publish-backend.yml"
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  build-and-push:
+    name: Build & Push Pokedex API Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set lowercase owner
+        id: vars
+        run: echo "owner_lowercase=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_OUTPUT
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ steps.vars.outputs.owner_lowercase }}/pokedex-backend:latest
+            ${{ github.ref_name && format('ghcr.io/{0}/pokedex-backend:{1}', steps.vars.outputs.owner_lowercase, github.ref_name) }}
+
+          build-args: |
+            VERSION=${{ github.ref_name != '' && github.ref_name || github.sha }}
