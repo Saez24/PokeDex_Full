@@ -64,6 +64,7 @@ export class PokemonService {
   public language = computed(() => this._language());
   private typeCache = new Map<string, any>();
   private _genIndex = 0;
+  private _fullyLoaded = false;
 
   setLanguage(lang: string) {
     this._language.set(lang);
@@ -72,6 +73,7 @@ export class PokemonService {
   setGeneration(index: number): void {
     if (index === this._genIndex) return;
     this._genIndex = index;
+    this._fullyLoaded = false;
     this.selectedGenIndex.set(index);
     this.pokemon.set([]);
     this.offset.set(0);
@@ -192,14 +194,100 @@ export class PokemonService {
     );
   }
 
-  loadMore(): void {
-    if (this.loading() || !this.hasMore()) return;
-    this.loading.set(true);
+  /** Setzt die Suche und lädt ggf. alle verbleibenden Pokémon der Generation vollständig. */
+  setSearch(query: string): void {
+    this.searchQuery.set(query);
+    if (query.trim() && !this._fullyLoaded && this.hasMore()) {
+      this._loadAllRemaining();
+    }
+  }
+
+  /** Lädt alle verbleibenden Pokémon rekursiv in Batches à 200, bis die Generation vollständig geladen ist. */
+  private _loadAllRemaining(): void {
+    if (this._fullyLoaded || this.loading()) return;
 
     const gen = GENERATIONS[this._genIndex];
-    const genOffset = gen.offset;
-    const maxForGen = gen.limit;
+    const maxForGen = this._genIndex === 0 ? 1025 : gen.limit;
     const currentOffset = this.offset();
+    const remaining = maxForGen - currentOffset;
+
+    if (remaining <= 0) {
+      this._fullyLoaded = true;
+      this.hasMore.set(false);
+      return;
+    }
+
+    this.loading.set(true);
+    const batchSize = Math.min(200, remaining);
+    const fetchOffset = this._genIndex === 0 ? currentOffset : gen.offset + currentOffset;
+
+    this.api
+      .getResource<ApiListResponse<NamedResource>>(
+        'pokemon',
+        `limit=${batchSize}&offset=${fetchOffset}`,
+      )
+      .subscribe({
+        next: (response) => {
+          forkJoin(
+            response.results.map((p) =>
+              forkJoin({
+                base: this.api.getResource<Pokemon>('pokemon', undefined, p.name),
+                species: this.api.getResource<any>('pokemon-species', undefined, p.name).pipe(
+                  catchError(() => of(null)),
+                ),
+              }),
+            ),
+          ).subscribe({
+            next: (results) => {
+              const uniqueTypeNames = [
+                ...new Set(results.flatMap((r) => r.base.types.map((t: any) => t.type.name))),
+              ];
+              const uniqueAbilityNames = [
+                ...new Set(results.flatMap((r) => r.base.abilities.map((a: any) => a.ability.name))),
+              ];
+              const uncachedTypes = uniqueTypeNames.filter((n) => !this.typeCache.has(n));
+              const uncachedAbilities = uniqueAbilityNames.filter((n) => !this.typeCache.has(n));
+              const allUncached = [...uncachedTypes, ...uncachedAbilities];
+
+              const finalize = () => {
+                const enriched = results.map((r) => ({ ...r.base, species: r.species }));
+                this.pokemon.update((prev) => [...prev, ...enriched]);
+                this.offset.update((v) => v + batchSize);
+                const newOffset = currentOffset + batchSize;
+                if (newOffset >= maxForGen) {
+                  this._fullyLoaded = true;
+                  this.hasMore.set(false);
+                }
+                this.loading.set(false);
+                if (!this._fullyLoaded) {
+                  this._loadAllRemaining();
+                }
+              };
+
+              if (!allUncached.length) { finalize(); return; }
+
+              forkJoin([
+                ...uncachedTypes.map((n) => this.api.getResource<any>('type', undefined, n)),
+                ...uncachedAbilities.map((n) => this.api.getResource<any>('ability', undefined, n)),
+              ]).subscribe({
+                next: (details) => {
+                  uncachedTypes.forEach((name, i) => this.typeCache.set(name, details[i]));
+                  uncachedAbilities.forEach((name, i) =>
+                    this.typeCache.set(name, details[uncachedTypes.length + i]),
+                  );
+                  finalize();
+                },
+                error: () => finalize(),
+              });
+            },
+            error: () => this.loading.set(false),
+          });
+        },
+        error: () => this.loading.set(false),
+      });
+  }
+
+  loadMore(): void {
 
     // In "All"-Mode (index 0) laden wir unbegrenzt
     // In Gen-Modus laden wir nur bis zum Limit

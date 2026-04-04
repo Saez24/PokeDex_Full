@@ -165,7 +165,7 @@ export class Content implements OnInit, AfterViewInit, OnDestroy {
 
   onSearch(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
-    this.pokemonService.searchQuery.set(value);
+    this.pokemonService.setSearch(value);
   }
 
   onTypeFilter(event: Event): void {
