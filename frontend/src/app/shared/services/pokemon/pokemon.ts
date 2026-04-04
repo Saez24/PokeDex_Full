@@ -288,6 +288,13 @@ export class PokemonService {
   }
 
   loadMore(): void {
+    if (this.loading() || !this.hasMore()) return;
+    this.loading.set(true);
+
+    const gen = GENERATIONS[this._genIndex];
+    const genOffset = gen.offset;
+    const maxForGen = gen.limit;
+    const currentOffset = this.offset();
 
     // In "All"-Mode (index 0) laden wir unbegrenzt
     // In Gen-Modus laden wir nur bis zum Limit
