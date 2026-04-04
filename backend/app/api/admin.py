@@ -307,24 +307,6 @@ async def run_seed(limit: int, offset: int, skip_moves: bool):
         finally:
             state["finished_at"] = datetime.now().isoformat()
             await _write_state(state)
-                            await cache_svc.save_move(session, data)
-                            session.add(SeedProgress(entity="move", name=move_name, status="done"))
-                            await session.commit()
-                        except Exception as e:
-                            await session.rollback()
-                            state.errors.append(f"move/{move_name}: {e}")
-
-            if state.status == "running":
-                state.status = "done"
-                state.current_step = "Completed"
-
-        except Exception as e:
-            state.status = "error"
-            state.current_step = f"Fatal error: {e}"
-            state.errors.append(str(e))
-
-        finally:
-            state.finished_at = datetime.now()
 
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────
