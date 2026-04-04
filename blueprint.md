@@ -6,12 +6,12 @@
 
 ## Stack
 
-| Schicht  | Technologie                                       |
-| -------- | ------------------------------------------------- |
-| Frontend | Angular 21, Zoneless, Signals, Material 3         |
-| Backend  | FastAPI 0.135, SQLAlchemy 2.0, asyncpg            |
-| Caching  | Redis (L1) → PostgreSQL JSONB (L2) → PokeAPI (L3) |
-| Testing  | Vitest (Zoneless Mode)                            |
+| Schicht  | Technologie                                                          |
+| -------- | -------------------------------------------------------------------- |
+| Frontend | Angular 21, Zoneless, Signals, Material 3                            |
+| Backend  | FastAPI 0.135, SQLAlchemy 2.0, asyncpg                               |
+| Caching  | Redis (L1) → PostgreSQL JSONB (L2) → PokeAPI (L3)                    |
+| Testing  | Vitest (Frontend, Zoneless Mode) · pytest + pytest-asyncio (Backend) |
 
 ---
 
@@ -90,13 +90,13 @@ App (root, RouterOutlet)
 
 ## Backend-Erweiterungen (Backlog)
 
-| Feature               | Endpoint                                      | Schwierigkeit |
-| --------------------- | --------------------------------------------- | ------------- |
-| Filter-Suche          | `GET /api/v2/pokemon?type=water&generation=1` | ⭐⭐          |
-| Stats-Aggregation     | `GET /api/v2/stats`                           | ⭐            |
-| Vergleich             | `GET /api/v2/pokemon/compare?ids=1,4,7`       | ⭐            |
-| Generationen-Endpoint | `GET /api/v2/generation/{id}`                 | ⭐⭐          |
-| Item-Endpunkte        | `GET /api/v2/item/{name}`                     | ⭐⭐⭐        |
+| Feature               | Endpoint                                      | Schwierigkeit | Status    |
+| --------------------- | --------------------------------------------- | ------------- | --------- |
+| Filter-Suche          | `GET /api/v2/pokemon?type=water&generation=1` | ⭐⭐          | ✅ Fertig |
+| Stats-Aggregation     | `GET /api/v2/stats`                           | ⭐            | ✅ Fertig |
+| Vergleich             | `GET /api/v2/pokemon/compare?ids=1,4,7`       | ⭐            | ✅ Fertig |
+| Generationen-Endpoint | `GET /api/v2/generation/{id}`                 | ⭐⭐          | ✅ Fertig |
+| Item-Endpunkte        | `GET /api/v2/item/{name}`                     | ⭐⭐⭐        | ✅ Fertig |
 
 ---
 
@@ -125,8 +125,8 @@ App (root, RouterOutlet)
 
 | Ziel                   | Kriterium                                                                                                                                 |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Build                  | `ng build` ohne Fehler/Warnings                                                                                                           |
-| Tests                  | `npm test` — alle Specs grün (15/15) ✅                                                                                                   |
+| Build                  | `ng build` ohne Fehler/Warnings ✅                                                                                                        |
+| Tests                  | `npm test` — alle Specs grün (15/15) ✅ · `python3 -m pytest` — 46/46 Backend-Tests grün ✅                                               |
 | Lighthouse A11Y        | `role="tablist/tab"` + `aria-selected` auf Move-Tabs, `width`/`height` auf alle Sprites (CLS=0), `decoding="async"`, `<main>` Landmark ✅ |
 | Lighthouse Performance | Initial Bundle 672kB raw / **160kB gzipped**, Lazy-Chunks für alle 6 Route-Features ✅                                                    |
 | Fokus-Ring             | Alle interaktiven Elemente via Tab erreichbar                                                                                             |

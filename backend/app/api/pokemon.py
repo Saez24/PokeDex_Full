@@ -28,9 +28,16 @@ BASE_URL = "http://localhost:8000/api/v2"
 async def list_pokemon(
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
+    type_name: str | None = Query(default=None, alias="type", description="Filtert nach Typ (z.B. 'water')"),
+    generation: int | None = Query(default=None, ge=1, le=9, description="Filtert nach Generation (1–9)"),
     session: AsyncSession = Depends(get_session),
 ):
-    redis_key = redis_svc.key_pokemon_list(limit, offset)
+    is_filtered = type_name is not None or generation is not None
+
+    if is_filtered:
+        redis_key = redis_svc.key_pokemon_filter(limit, offset, type_name, generation)
+    else:
+        redis_key = redis_svc.key_pokemon_list(limit, offset)
 
     # 1. Redis
     cached = await redis_svc.get(redis_key)
@@ -38,17 +45,30 @@ async def list_pokemon(
         return cached
 
     # 2. PostgreSQL
-    total = await cache_svc.count_pokemon(session)
-    items = await cache_svc.list_pokemon(session, limit=limit, offset=offset)
+    if is_filtered:
+        items, total = await cache_svc.filter_pokemon(
+            session, limit=limit, offset=offset,
+            type_name=type_name, generation=generation,
+        )
+    else:
+        total = await cache_svc.count_pokemon(session)
+        items = await cache_svc.list_pokemon(session, limit=limit, offset=offset)
 
     next_offset = offset + limit
     prev_offset = offset - limit
 
+    # Query-Params für Pagination-URLs bei gefilterter Anfrage
+    base_params = f"limit={limit}"
+    if type_name:
+        base_params += f"&type={type_name}"
+    if generation:
+        base_params += f"&generation={generation}"
+
     response = {
         "count": total,
-        "next": f"{BASE_URL}/pokemon?limit={limit}&offset={next_offset}"
+        "next": f"{BASE_URL}/pokemon?{base_params}&offset={next_offset}"
                 if next_offset < total else None,
-        "previous": f"{BASE_URL}/pokemon?limit={limit}&offset={prev_offset}"
+        "previous": f"{BASE_URL}/pokemon?{base_params}&offset={prev_offset}"
                     if offset > 0 else None,
         "results": [
             {"name": p["name"], "url": f"{BASE_URL}/pokemon/{p['id']}/"}
@@ -58,6 +78,37 @@ async def list_pokemon(
 
     await redis_svc.set(redis_key, response)
     return response
+
+
+# ── Pokemon Compare ───────────────────────────────────────────────────────────
+# WICHTIG: Muss VOR /pokemon/{name_or_id} definiert sein (Routing-Reihenfolge)
+
+@router.get("/pokemon/compare")
+async def compare_pokemon(
+    ids: str = Query(..., description="Komma-getrennte Pokémon-IDs oder Namen (max. 4)"),
+    session: AsyncSession = Depends(get_session),
+):
+    id_list = [i.strip() for i in ids.split(",") if i.strip()][:4]
+    if not id_list:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=422, detail="Mindestens eine ID muss angegeben werden")
+
+    results = []
+    not_found = []
+    for id_ in id_list:
+        # 1. Redis
+        cached = await redis_svc.get(redis_svc.key_pokemon_detail(id_))
+        if cached is not None:
+            results.append(cached)
+            continue
+        # 2. PostgreSQL
+        data = await cache_svc.get_pokemon(session, id_)
+        if data:
+            results.append(data)
+        else:
+            not_found.append(id_)
+
+    return {"count": len(results), "results": results, "not_found": not_found}
 
 
 # ── Pokemon Detail ────────────────────────────────────────────────────────────
@@ -163,6 +214,99 @@ async def get_move(
     data = await cache_svc.get_move(session, name_or_id)
     if not data:
         raise HTTPException(status_code=404, detail=f"Move '{name_or_id}' not found")
+    return data
+
+
+# ── Stats ────────────────────────────────────────────────────────────────────
+
+@router.get("/stats")
+async def get_stats(session: AsyncSession = Depends(get_session)):
+    """Gibt die Anzahl gecachter Einträge pro Kategorie zurück."""
+    return await cache_svc.get_stats(session)
+
+
+# ── Generation ──────────────────────────────────────────────────────────────
+
+@router.get("/generation")
+async def list_generations(session: AsyncSession = Depends(get_session)):
+    redis_key = redis_svc.key_generation_list()
+    cached = await redis_svc.get(redis_key)
+    if cached is not None:
+        return cached
+
+    items = await cache_svc.list_generations(session)
+    response = {
+        "count": len(items),
+        "results": [{"name": g["name"], "url": f"{BASE_URL}/generation/{g['id']}/"} for g in items],
+    }
+    await redis_svc.set(redis_key, response)
+    return response
+
+
+@router.get("/generation/{id_or_name}")
+async def get_generation(
+    id_or_name: str,
+    session: AsyncSession = Depends(get_session),
+):
+    redis_key = redis_svc.key_generation(id_or_name)
+    cached = await redis_svc.get(redis_key)
+    if cached is not None:
+        return cached
+
+    data = await cache_svc.get_generation(session, id_or_name)
+    if not data:
+        raise HTTPException(status_code=404, detail=f"Generation '{id_or_name}' not found")
+
+    await redis_svc.set(redis_key, data)
+    # Auch unter Alternativ-Key (ID ↔ Name) speichern
+    alt_key = redis_svc.key_generation(data["name"] if id_or_name.isdigit() else str(data["id"]))
+    await redis_svc.set(alt_key, data)
+    return data
+
+
+# ── Item ───────────────────────────────────────────────────────────────────────
+
+@router.get("/item")
+async def list_items(
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+    session: AsyncSession = Depends(get_session),
+):
+    redis_key = redis_svc.key_item_list(limit, offset)
+    cached = await redis_svc.get(redis_key)
+    if cached is not None:
+        return cached
+
+    items, total = await cache_svc.list_items(session, limit=limit, offset=offset)
+    next_offset = offset + limit
+    prev_offset = offset - limit
+    response = {
+        "count": total,
+        "next": f"{BASE_URL}/item?limit={limit}&offset={next_offset}" if next_offset < total else None,
+        "previous": f"{BASE_URL}/item?limit={limit}&offset={prev_offset}" if offset > 0 else None,
+        "results": [{"name": it["name"], "url": f"{BASE_URL}/item/{it['id']}/"} for it in items],
+    }
+    await redis_svc.set(redis_key, response)
+    return response
+
+
+@router.get("/item/{name_or_id}")
+async def get_item(
+    name_or_id: str,
+    session: AsyncSession = Depends(get_session),
+):
+    redis_key = redis_svc.key_item(name_or_id)
+    cached = await redis_svc.get(redis_key)
+    if cached is not None:
+        return cached
+
+    data = await cache_svc.get_item(session, name_or_id)
+    if not data:
+        raise HTTPException(status_code=404, detail=f"Item '{name_or_id}' not found")
+
+    await redis_svc.set(redis_key, data)
+    alt_key = redis_svc.key_item(data["name"] if name_or_id.isdigit() else str(data["id"]))
+    await redis_svc.set(alt_key, data)
     return data
 
 

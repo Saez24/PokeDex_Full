@@ -17,6 +17,7 @@ from app.db.session import AsyncSessionLocal
 from app.models.cache import SeedProgress
 from app.services.pokeapi import fetch, fetch_endpoint, fetch_list
 from app.services import cache as cache_svc
+from app.models.cache import CachedGeneration, CachedItem
 
 # Parallelität — nicht zu hoch um Rate-Limits zu vermeiden
 CONCURRENCY = 5
@@ -49,6 +50,53 @@ async def fetch_with_sem(sem: asyncio.Semaphore, client: httpx.AsyncClient, url:
 
 
 # ── Einzelne Seeder ───────────────────────────────────────────────────────────
+
+async def seed_generations(client: httpx.AsyncClient):
+    print("\n📦 Lade Generationen …")
+    gen_list = await fetch_list(client, "generation")
+
+    async with AsyncSessionLocal() as session:
+        for item in gen_list["results"]:
+            name = item["name"]
+            if await already_seeded(session, "generation", name):
+                print(f"  ✓ {name} (gecacht)")
+                continue
+            try:
+                data = await fetch_endpoint(client, "generation", name)
+                await cache_svc.save_generation(session, data)
+                await mark_done(session, "generation", name)
+                await session.commit()
+                print(f"  ✅ generation/{name}")
+            except Exception as e:
+                await session.rollback()
+                await mark_error(session, "generation", name, str(e))
+                await session.commit()
+                print(f"  ❌ generation/{name}: {e}")
+
+
+async def seed_items(client: httpx.AsyncClient, limit: int = 500):
+    """Lädt die ersten `limit` Items (Standard: 500 — enthält alle wichtigen Items)."""
+    print(f"\n📦 Lade bis zu {limit} Items …")
+    item_list = await fetch_list(client, "item", limit=limit)
+    sem = asyncio.Semaphore(CONCURRENCY)
+
+    async with AsyncSessionLocal() as session:
+        for item in item_list["results"]:
+            name = item["name"]
+            if await already_seeded(session, "item", name):
+                continue
+            try:
+                async with sem:
+                    data = await fetch_endpoint(client, "item", name)
+                await cache_svc.save_item(session, data)
+                await mark_done(session, "item", name)
+                await session.commit()
+                print(f"  ✅ item/{name}")
+            except Exception as e:
+                await session.rollback()
+                await mark_error(session, "item", name, str(e))
+                await session.commit()
+                print(f"  ❌ item/{name}: {e}")
 
 async def seed_types(client: httpx.AsyncClient):
     print("\n📦 Lade Typen …")
@@ -193,25 +241,34 @@ async def seed_pokemon_and_species(
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
-async def main(limit: int, offset: int, skip_moves: bool):
+async def main(limit: int, offset: int, skip_moves: bool, skip_items: bool):
     print("🚀 Starte Seed …")
     print(f"   Pokémon: offset={offset}, limit={limit}")
 
     async with httpx.AsyncClient() as client:
-        # 1. Typen
+        # 1. Generationen
+        await seed_generations(client)
+
+        # 2. Typen
         await seed_types(client)
 
-        # 2. Pokémon + Species + Evolution Chains
+        # 3. Pokémon + Species + Evolution Chains
         all_abilities, all_moves = await seed_pokemon_and_species(client, limit, offset)
 
-        # 3. Abilities
+        # 4. Abilities
         await seed_abilities(client, sorted(all_abilities))
 
-        # 4. Moves (optional überspringen — sehr viele!)
+        # 5. Moves (optional überspringen — sehr viele!)
         if skip_moves:
             print(f"\n⏭️  Moves übersprungen ({len(all_moves)} gefunden)")
         else:
             await seed_moves(client, sorted(all_moves))
+
+        # 6. Items (optional überspringen)
+        if skip_items:
+            print("\n⏭️  Items übersprungen")
+        else:
+            await seed_items(client)
 
     print("\n✅ Seed abgeschlossen!")
 
@@ -221,6 +278,7 @@ if __name__ == "__main__":
     parser.add_argument("--limit",  type=int, default=151, help="Anzahl Pokémon (default: 151 = Gen 1)")
     parser.add_argument("--offset", type=int, default=0,   help="Start-Offset (default: 0)")
     parser.add_argument("--skip-moves", action="store_true", help="Moves nicht laden (spart Zeit)")
+    parser.add_argument("--skip-items", action="store_true", help="Items nicht laden")
     args = parser.parse_args()
 
-    asyncio.run(main(limit=args.limit, offset=args.offset, skip_moves=args.skip_moves))
+    asyncio.run(main(limit=args.limit, offset=args.offset, skip_moves=args.skip_moves, skip_items=args.skip_items))

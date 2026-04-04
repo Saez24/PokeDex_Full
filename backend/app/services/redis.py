@@ -49,6 +49,26 @@ def key_pokemon_detail(name_or_id: str) -> str:
 def key_pokemon_list(limit: int, offset: int) -> str:
     return f"{PREFIX}:pokemon_list:{limit}:{offset}"
 
+def key_pokemon_filter(limit: int, offset: int, type_name: str | None, generation: int | None) -> str:
+    parts = [str(limit), str(offset)]
+    if type_name:
+        parts.append(f"t:{type_name}")
+    if generation:
+        parts.append(f"g:{generation}")
+    return f"{PREFIX}:pokemon_filter:{'_'.join(parts)}"
+
+def key_generation(id_or_name: str) -> str:
+    return f"{PREFIX}:generation:{id_or_name}"
+
+def key_generation_list() -> str:
+    return f"{PREFIX}:generation_list"
+
+def key_item(name_or_id: str) -> str:
+    return f"{PREFIX}:item:{name_or_id}"
+
+def key_item_list(limit: int, offset: int) -> str:
+    return f"{PREFIX}:item_list:{limit}:{offset}"
+
 
 # ── Generic get/set ───────────────────────────────────────────────────────────
 

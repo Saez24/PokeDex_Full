@@ -61,6 +61,24 @@ class CachedMove(Base):
     data     = Column(JSONB, nullable=False)
 
 
+class CachedGeneration(Base):
+    """Gecachter /generation/{id} Response"""
+    __tablename__ = "cached_generation"
+
+    id       = Column(Integer, primary_key=True)
+    name     = Column(String, unique=True, index=True)
+    data     = Column(JSONB, nullable=False)
+
+
+class CachedItem(Base):
+    """Gecachter /item/{name} Response"""
+    __tablename__ = "cached_item"
+
+    id       = Column(Integer, primary_key=True)
+    name     = Column(String, unique=True, index=True)
+    data     = Column(JSONB, nullable=False)
+
+
 class SeedProgress(Base):
     """Verfolgt welche Pokémon bereits geseedet wurden"""
     __tablename__ = "seed_progress"
