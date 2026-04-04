@@ -145,10 +145,22 @@ async def get_species(
     name_or_id: str,
     session: AsyncSession = Depends(get_session),
 ):
+    # Direkt aus Cache laden
     data = await cache_svc.get_species(session, name_or_id)
-    if not data:
-        raise HTTPException(status_code=404, detail=f"Species '{name_or_id}' not found")
-    return data
+    if data:
+        return data
+
+    # Fallback für Formvarianten (z.B. "pyroar-male" → Species "pyroar"):
+    # Pokémon-Daten laden und daraus den echten Species-Namen ermitteln.
+    poke_data = await cache_svc.get_pokemon(session, name_or_id)
+    if poke_data:
+        species_name = poke_data.get("species", {}).get("name")
+        if species_name and species_name != name_or_id:
+            data = await cache_svc.get_species(session, species_name)
+            if data:
+                return data
+
+    raise HTTPException(status_code=404, detail=f"Species '{name_or_id}' not found")
 
 
 # ── Evolution Chain ───────────────────────────────────────────────────────────

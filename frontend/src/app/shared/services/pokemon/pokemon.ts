@@ -1,5 +1,5 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { firstValueFrom, forkJoin } from 'rxjs';
+import { catchError, firstValueFrom, forkJoin, of } from 'rxjs';
 import { Pokemon } from '../../models/pokemon.model';
 import { Api } from '../api/api';
 import { ApiListResponse } from '../../models/api-list-response.model';
@@ -227,7 +227,9 @@ export class PokemonService {
             response.results.map((p) =>
               forkJoin({
                 base: this.api.getResource<Pokemon>('pokemon', undefined, p.name),
-                species: this.api.getResource<any>('pokemon-species', undefined, p.name),
+                species: this.api.getResource<any>('pokemon-species', undefined, p.name).pipe(
+                  catchError(() => of(null)),
+                ),
               }),
             ),
           ).subscribe({
