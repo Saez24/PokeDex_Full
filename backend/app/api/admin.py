@@ -240,18 +240,21 @@ async def run_seed(limit: int, offset: int, skip_moves: bool):
                             all_moves.add(m["move"]["name"])
 
                     # Species + Evolution Chain
+                    # Formvarianten (z.B. gourgeist-average) haben keine eigene Species →
+                    # Basis-Name aus poke_data["species"]["name"] verwenden
+                    species_name = (poke_data or {}).get("species", {}).get("name") or name
                     already_species = await session.execute(
                         select(SeedProgress).where(
                             SeedProgress.entity == "species",
-                            SeedProgress.name == name,
+                            SeedProgress.name == species_name,
                             SeedProgress.status == "done",
                         )
                     )
                     if not already_species.scalar_one_or_none():
                         try:
-                            species_data = await fetch_endpoint(client, "pokemon-species", name)
+                            species_data = await fetch_endpoint(client, "pokemon-species", species_name)
                             await cache_svc.save_species(session, species_data)
-                            session.add(SeedProgress(entity="species", name=name, status="done"))
+                            session.add(SeedProgress(entity="species", name=species_name, status="done"))
 
                             chain_url = species_data["evolution_chain"]["url"]
                             chain_id = int(chain_url.rstrip("/").split("/")[-1])
@@ -270,7 +273,7 @@ async def run_seed(limit: int, offset: int, skip_moves: bool):
                             await session.commit()
                         except Exception as e:
                             await session.rollback()
-                            state["errors"].append(f"species/{name}: {e}")
+                            state["errors"].append(f"species/{species_name}: {e}")
                             await _write_state(state)
 
             # ── 3. Abilities ──
@@ -359,7 +362,7 @@ Requires `X-Admin-Secret` header.
     """,
 )
 async def start_seed(
-    body: Annotated[SeedRequest, Body(examples=_SEED_EXAMPLES)],
+    body: Annotated[SeedRequest, Body(openapi_examples=_SEED_EXAMPLES)],
     background_tasks: BackgroundTasks,
     x_admin_secret: str = Header(..., description="Admin secret from .env"),
 ):
