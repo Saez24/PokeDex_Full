@@ -26,7 +26,7 @@ BASE_URL = "http://localhost:8000/api/v2"
 
 @router.get("/pokemon")
 async def list_pokemon(
-    limit: int = Query(default=20, ge=1, le=100),
+    limit: int = Query(default=20, ge=1, le=250),
     offset: int = Query(default=0, ge=0),
     type_name: str | None = Query(default=None, alias="type", description="Filtert nach Typ (z.B. 'water')"),
     generation: int | None = Query(default=None, ge=1, le=9, description="Filtert nach Generation (1–9)"),
