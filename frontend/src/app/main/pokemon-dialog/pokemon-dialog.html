@@ -3,7 +3,8 @@
   <div class="d-art">
     <div class="d-art-bg"></div>
     <div class="d-art-grid"></div>
-    <img class="d-sprite" [src]="spriteUrl" [alt]="pokemon.name" [class.d-sprite--shiny]="isShiny()" />
+    <img class="d-sprite" [src]="spriteUrl" [alt]="pokemon.name" [class.d-sprite--shiny]="isShiny()" width="220"
+      height="220" decoding="async" />
 
     <!-- Top-right action buttons -->
     <div class="d-actions">
@@ -227,7 +228,8 @@
         <!-- Pokemon step -->
         <div class="evo-step" [class.evo-active]="step.id === pokemon.id">
           <div class="evo-img-wrap">
-            <img class="evo-sprite" [src]="step.spriteUrl" [alt]="step.localizedName" loading="lazy" />
+            <img class="evo-sprite" [src]="step.spriteUrl" [alt]="step.localizedName" width="80" height="80"
+              loading="lazy" decoding="async" />
           </div>
           <span class="evo-name">{{ step.localizedName }}</span>
           <span class="evo-id">#{{ step.id.toString().padStart(3, '0') }}</span>
@@ -243,13 +245,13 @@
   <div class="tab-content">
 
     <!-- Move-Kategorie-Tabs -->
-    <div class="move-tabs">
-      <button class="move-tab-btn" [class.move-tab-btn--active]="moveTab() === 'level-up'"
-        (click)="switchMoveTab('level-up')" i18n>Level-up</button>
-      <button class="move-tab-btn" [class.move-tab-btn--active]="moveTab() === 'machine'"
-        (click)="switchMoveTab('machine')">TM / HM</button>
-      <button class="move-tab-btn" [class.move-tab-btn--active]="moveTab() === 'egg'" (click)="switchMoveTab('egg')"
-        i18n>Egg</button>
+    <div class="move-tabs" role="tablist" aria-label="Move categories">
+      <button class="move-tab-btn" role="tab" [class.move-tab-btn--active]="moveTab() === 'level-up'"
+        [attr.aria-selected]="moveTab() === 'level-up'" (click)="switchMoveTab('level-up')" i18n>Level-up</button>
+      <button class="move-tab-btn" role="tab" [class.move-tab-btn--active]="moveTab() === 'machine'"
+        [attr.aria-selected]="moveTab() === 'machine'" (click)="switchMoveTab('machine')">TM / HM</button>
+      <button class="move-tab-btn" role="tab" [class.move-tab-btn--active]="moveTab() === 'egg'"
+        [attr.aria-selected]="moveTab() === 'egg'" (click)="switchMoveTab('egg')" i18n>Egg</button>
     </div>
 
     @if (movesLoading() || tmMovesLoading() || eggMovesLoading()) {

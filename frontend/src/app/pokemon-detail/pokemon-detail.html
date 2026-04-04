@@ -203,7 +203,8 @@
                 }
                 <div class="evo-step" [class.evo-active]="step.id === p.id">
                     <div class="evo-img-wrap">
-                        <img class="evo-sprite" [src]="step.spriteUrl" [alt]="step.localizedName" loading="lazy" />
+                        <img class="evo-sprite" [src]="step.spriteUrl" [alt]="step.localizedName" width="80" height="80"
+                            loading="lazy" decoding="async" />
                     </div>
                     <span class="evo-name">{{ step.localizedName }}</span>
                     <span class="evo-id">#{{ step.id.toString().padStart(3, '0') }}</span>
@@ -219,13 +220,14 @@
     <div class="tab-content">
 
         <!-- Move category tabs -->
-        <div class="move-tabs">
-            <button class="move-tab-btn" [class.move-tab-btn--active]="moveTab() === 'level-up'"
-                (click)="switchMoveTab('level-up')" i18n>Level-up</button>
-            <button class="move-tab-btn" [class.move-tab-btn--active]="moveTab() === 'machine'"
-                (click)="switchMoveTab('machine')">TM / HM</button>
-            <button class="move-tab-btn" [class.move-tab-btn--active]="moveTab() === 'egg'"
-                (click)="switchMoveTab('egg')" i18n>Egg</button>
+        <div class="move-tabs" role="tablist" aria-label="Move categories">
+            <button class="move-tab-btn" role="tab" [class.move-tab-btn--active]="moveTab() === 'level-up'"
+                [attr.aria-selected]="moveTab() === 'level-up'" (click)="switchMoveTab('level-up')"
+                i18n>Level-up</button>
+            <button class="move-tab-btn" role="tab" [class.move-tab-btn--active]="moveTab() === 'machine'"
+                [attr.aria-selected]="moveTab() === 'machine'" (click)="switchMoveTab('machine')">TM / HM</button>
+            <button class="move-tab-btn" role="tab" [class.move-tab-btn--active]="moveTab() === 'egg'"
+                [attr.aria-selected]="moveTab() === 'egg'" (click)="switchMoveTab('egg')" i18n>Egg</button>
         </div>
 
         @if (movesLoading() || tmMovesLoading() || eggMovesLoading()) {

@@ -28,7 +28,8 @@
             <!-- Filled card -->
             <div class="cmp-card-header">
                 <div class="cmp-sprite-wrap">
-                    <img class="cmp-sprite" [src]="spriteUrl(p)" [alt]="p.name" loading="lazy" />
+                    <img class="cmp-sprite" [src]="spriteUrl(p)" [alt]="p.name" width="120" height="120" loading="lazy"
+                        decoding="async" />
                 </div>
                 <button class="cmp-remove-btn" (click)="removePokemon(i)" i18n-aria-label aria-label="Remove">✕</button>
             </div>

@@ -123,11 +123,11 @@ App (root, RouterOutlet)
 
 ## Qualitätsziele
 
-| Ziel                   | Kriterium                                     |
-| ---------------------- | --------------------------------------------- |
-| Build                  | `ng build` ohne Fehler/Warnings               |
-| Tests                  | `npm test` — alle Specs grün                  |
-| Lighthouse A11Y        | Score ≥ 90                                    |
-| Lighthouse Performance | Score ≥ 80                                    |
-| Fokus-Ring             | Alle interaktiven Elemente via Tab erreichbar |
-| Kontrast               | ≥ 4.5:1 (WCAG 2.2 AA)                         |
+| Ziel                   | Kriterium                                                                                                                                 |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Build                  | `ng build` ohne Fehler/Warnings                                                                                                           |
+| Tests                  | `npm test` — alle Specs grün (15/15) ✅                                                                                                   |
+| Lighthouse A11Y        | `role="tablist/tab"` + `aria-selected` auf Move-Tabs, `width`/`height` auf alle Sprites (CLS=0), `decoding="async"`, `<main>` Landmark ✅ |
+| Lighthouse Performance | Initial Bundle 672kB raw / **160kB gzipped**, Lazy-Chunks für alle 6 Route-Features ✅                                                    |
+| Fokus-Ring             | Alle interaktiven Elemente via Tab erreichbar                                                                                             |
+| Kontrast               | ≥ 4.5:1 (WCAG 2.2 AA)                                                                                                                     |

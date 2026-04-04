@@ -123,7 +123,8 @@
         <div class="td-pokemon-grid">
             @for (p of displayedPokemon(); track p.id) {
             <a class="td-pokemon-card" [routerLink]="['/pokemon', p.id]">
-                <img class="td-pokemon-sprite" [src]="p.sprite" [alt]="p.name" loading="lazy" />
+                <img class="td-pokemon-sprite" [src]="p.sprite" [alt]="p.name" width="96" height="96" loading="lazy"
+                    decoding="async" />
                 <div class="td-pokemon-id">#{{ p.id.toString().padStart(3, '0') }}</div>
                 <div class="td-pokemon-name">{{ p.name | titlecase }}</div>
             </a>
