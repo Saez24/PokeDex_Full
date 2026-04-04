@@ -14,7 +14,8 @@ from datetime import datetime
 from typing import Literal
 
 import httpx
-from fastapi import APIRouter, BackgroundTasks, Header, HTTPException, Query
+from typing import Annotated
+from fastapi import APIRouter, BackgroundTasks, Body, Header, HTTPException, Query
 from pydantic import BaseModel
 
 from app.db.session import AsyncSessionLocal
@@ -79,24 +80,57 @@ class SeedRequest(BaseModel):
     offset: int = 0
     skip_moves: bool = True
 
-    model_config = {
-        "json_schema_extra": {
-            "examples": [
-                {
-                    "summary": "Gen 1 ohne Moves (schnell)",
-                    "value": {"limit": 151, "offset": 0, "skip_moves": True},
-                },
-                {
-                    "summary": "Gen 1 mit Moves (langsam)",
-                    "value": {"limit": 151, "offset": 0, "skip_moves": False},
-                },
-                {
-                    "summary": "Nur erste 20",
-                    "value": {"limit": 20, "offset": 0, "skip_moves": True},
-                },
-            ]
-        }
-    }
+
+_SEED_EXAMPLES = {
+    "Alles mit Moves (vollständig)": {
+        "summary": "Alle 1025 Pokémon inkl. Moves — dauert ~30-60 min",
+        "value": {"limit": 1025, "offset": 0, "skip_moves": False},
+    },
+    "Alles ohne Moves (schnell)": {
+        "summary": "Alle 1025 Pokémon, keine Moves — dauert ~10-20 min",
+        "value": {"limit": 1025, "offset": 0, "skip_moves": True},
+    },
+    "Gen 1 (Kanto, #1–151)": {
+        "summary": "151 Pokémon ohne Moves",
+        "value": {"limit": 151, "offset": 0, "skip_moves": True},
+    },
+    "Gen 2 (Johto, #152–251)": {
+        "summary": "100 Pokémon ohne Moves",
+        "value": {"limit": 100, "offset": 151, "skip_moves": True},
+    },
+    "Gen 3 (Hoenn, #252–386)": {
+        "summary": "135 Pokémon ohne Moves",
+        "value": {"limit": 135, "offset": 251, "skip_moves": True},
+    },
+    "Gen 4 (Sinnoh, #387–493)": {
+        "summary": "107 Pokémon ohne Moves",
+        "value": {"limit": 107, "offset": 386, "skip_moves": True},
+    },
+    "Gen 5 (Unova, #494–649)": {
+        "summary": "156 Pokémon ohne Moves",
+        "value": {"limit": 156, "offset": 493, "skip_moves": True},
+    },
+    "Gen 6 (Kalos, #650–721)": {
+        "summary": "72 Pokémon ohne Moves",
+        "value": {"limit": 72, "offset": 649, "skip_moves": True},
+    },
+    "Gen 7 (Alola, #722–809)": {
+        "summary": "88 Pokémon ohne Moves",
+        "value": {"limit": 88, "offset": 721, "skip_moves": True},
+    },
+    "Gen 8 (Galar, #810–905)": {
+        "summary": "96 Pokémon ohne Moves",
+        "value": {"limit": 96, "offset": 809, "skip_moves": True},
+    },
+    "Gen 9 (Paldea, #906–1025)": {
+        "summary": "120 Pokémon ohne Moves",
+        "value": {"limit": 120, "offset": 905, "skip_moves": True},
+    },
+    "Nur erste 20 (Test)": {
+        "summary": "20 Pokémon zum Testen",
+        "value": {"limit": 20, "offset": 0, "skip_moves": True},
+    },
+}
 
 
 class SeedStatusResponse(BaseModel):
@@ -325,7 +359,7 @@ Requires `X-Admin-Secret` header.
     """,
 )
 async def start_seed(
-    body: SeedRequest,
+    body: Annotated[SeedRequest, Body(examples=_SEED_EXAMPLES)],
     background_tasks: BackgroundTasks,
     x_admin_secret: str = Header(..., description="Admin secret from .env"),
 ):
