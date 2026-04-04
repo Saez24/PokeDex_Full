@@ -588,3 +588,13 @@
   gap: 10px;
   padding: 8px 24px 24px;
 }
+
+.search-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  color: var(--app-text-secondary);
+  font-size: 0.9rem;
+}

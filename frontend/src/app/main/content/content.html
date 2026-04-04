@@ -118,3 +118,11 @@
   }
 </div>
 }
+
+<!-- Loading spinner (search / load-all) -->
+@if (pokemonService.loading() && pokemonService.pokemon().length > 0) {
+<div class="search-loading" aria-live="polite" aria-label="Pokémon werden geladen">
+  <mat-spinner diameter="36" />
+  <span>Lade weitere Pokémon…</span>
+</div>
+}

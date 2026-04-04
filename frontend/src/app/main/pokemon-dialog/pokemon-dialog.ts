@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatTabsModule } from '@angular/material/tabs';
 import { NgStyle, DecimalPipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { forkJoin, map, switchMap } from 'rxjs';
+import { forkJoin, map, of, switchMap } from 'rxjs';
 
 import {
   getPrimaryColor,
@@ -67,7 +67,13 @@ export class PokemonDialog implements OnInit {
   activeTab = signal(0);
 
   ngOnInit(): void {
-    this.loadSpecies();
+    // Species ist bereits im pokemon-Objekt (aus loadMore) vorhanden
+    const preloaded = (this.pokemon as any).species;
+    if (preloaded?.varieties) {
+      this.species.set(preloaded);
+    } else {
+      this.loadSpecies();
+    }
     this.loadAbilityDescriptions();
   }
 
@@ -214,7 +220,9 @@ export class PokemonDialog implements OnInit {
   }
 
   private loadSpecies(): void {
-    this.api.getResource<any>('pokemon-species', undefined, String(this.pokemon.id)).subscribe({
+    // Nach species-Name des Pokémon suchen (ID-Lookup kann falschen Cache-Key treffen)
+    const speciesName = (this.pokemon as any).species?.name ?? this.pokemon.name;
+    this.api.getResource<any>('pokemon-species', undefined, speciesName).subscribe({
       next: (data) => this.species.set(data),
       error: () => this.species.set(null),
     });
@@ -242,8 +250,16 @@ export class PokemonDialog implements OnInit {
 
   private loadEvolution(): void {
     this.evolutionLoading.set(true);
-    this.api
-      .getResource<any>('pokemon-species', undefined, String(this.pokemon.id))
+
+    // Species bereits geladen → direkt nutzen; sonst API-Call
+    const speciesAlready = this.species();
+    const speciesName = (this.pokemon as any).species?.name ?? this.pokemon.name;
+
+    const species$ = speciesAlready?.evolution_chain
+      ? of(speciesAlready)
+      : this.api.getResource<any>('pokemon-species', undefined, speciesName);
+
+    species$
       .pipe(
         switchMap((species) => {
           const chainId = species.evolution_chain.url.replace(/\/$/, '').split('/').pop();
