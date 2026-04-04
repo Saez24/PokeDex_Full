@@ -8,6 +8,7 @@ GET  /admin/seed/status → zeigt aktuellen Status
 DELETE /admin/seed      → bricht laufenden Seed ab
 """
 import asyncio
+import json
 import os
 from datetime import datetime
 from typing import Literal
@@ -26,30 +27,49 @@ router = APIRouter(prefix="/admin", tags=["Admin"])
 
 ADMIN_SECRET = os.getenv("ADMIN_SECRET", "changeme")
 
-# ── In-Memory Seed State ──────────────────────────────────────────────────────
+# ── Redis-backed Seed State ───────────────────────────────────────────────────
+# Speichert den Seed-Status in Redis, damit alle gunicorn-Worker
+# denselben State sehen (kein per-Worker In-Memory-State).
 
-class SeedState:
-    status: Literal["idle", "running", "done", "error"] = "idle"
-    started_at: datetime | None = None
-    finished_at: datetime | None = None
-    current_step: str = ""
-    progress: int = 0          # Anzahl verarbeiteter Pokémon
-    total: int = 0
-    errors: list[str] = []
-    task: asyncio.Task | None = None
+_SEED_KEY = "admin:seed:state"
+_SEED_TTL = 86400  # 24 h
 
-    def reset(self):
-        self.status = "idle"
-        self.started_at = None
-        self.finished_at = None
-        self.current_step = ""
-        self.progress = 0
-        self.total = 0
-        self.errors = []
-        self.task = None
+_DEFAULT_STATE: dict = {
+    "status": "idle",
+    "started_at": None,
+    "finished_at": None,
+    "current_step": "",
+    "progress": 0,
+    "total": 0,
+    "errors": [],
+}
+
+# In-Memory-Fallback (wenn Redis nicht verfügbar — gleicher Worker)
+_mem_state: dict = dict(_DEFAULT_STATE)
 
 
-seed_state = SeedState()
+async def _read_state() -> dict:
+    """Liest den Seed-State aus Redis; Fallback auf In-Memory."""
+    from app.services.redis import get_redis
+    try:
+        r = await get_redis()
+        raw = await r.get(_SEED_KEY)
+        if raw:
+            return json.loads(raw)
+    except Exception:
+        pass
+    return dict(_mem_state)
+
+
+async def _write_state(state: dict) -> None:
+    """Schreibt den Seed-State nach Redis und In-Memory-Fallback."""
+    _mem_state.update(state)
+    from app.services.redis import get_redis
+    try:
+        r = await get_redis()
+        await r.set(_SEED_KEY, json.dumps(state, default=str), ex=_SEED_TTL)
+    except Exception:
+        pass  # Fallback bereits aktualisiert
 
 
 # ── Schemas ───────────────────────────────────────────────────────────────────
@@ -99,16 +119,24 @@ def require_secret(x_admin_secret: str = Header(..., description="Admin secret f
 # ── Background Seed Task ──────────────────────────────────────────────────────
 
 async def run_seed(limit: int, offset: int, skip_moves: bool):
-    """Läuft als asyncio Background Task"""
-    state = seed_state
-    state.status = "running"
-    state.started_at = datetime.now()
-    state.errors = []
+    """Läuft als asyncio Background Task — schreibt State nach Redis."""
+    state: dict = {
+        **_DEFAULT_STATE,
+        "status": "running",
+        "started_at": datetime.now().isoformat(),
+        "errors": [],
+    }
+    await _write_state(state)
+
+    async def is_cancelled() -> bool:
+        current = await _read_state()
+        return current.get("status") != "running"
 
     async with httpx.AsyncClient() as client:
         try:
             # ── 1. Typen ──
-            state.current_step = "Loading types …"
+            state["current_step"] = "Loading types …"
+            await _write_state(state)
             type_list = await fetch_list(client, "type")
             async with AsyncSessionLocal() as session:
                 for item in type_list["results"]:
@@ -129,21 +157,24 @@ async def run_seed(limit: int, offset: int, skip_moves: bool):
                         await session.commit()
                     except Exception as e:
                         await session.rollback()
-                        state.errors.append(f"type/{name}: {e}")
+                        state["errors"].append(f"type/{name}: {e}")
+                        await _write_state(state)
 
             # ── 2. Pokémon ──
             pokemon_list = await fetch_list(client, "pokemon", limit=limit, offset=offset)
-            state.total = len(pokemon_list["results"])
+            state["total"] = len(pokemon_list["results"])
+            await _write_state(state)
             all_abilities: set[str] = set()
             all_moves: set[str] = set()
 
             for i, item in enumerate(pokemon_list["results"]):
-                if state.status != "running":
-                    break  # Abbruch durch DELETE-Endpoint
+                if await is_cancelled():
+                    break
 
                 name = item["name"]
-                state.current_step = f"Pokémon {i + 1}/{state.total}: {name}"
-                state.progress = i + 1
+                state["current_step"] = f"Pokémon {i + 1}/{state['total']}: {name}"
+                state["progress"] = i + 1
+                await _write_state(state)
 
                 async with AsyncSessionLocal() as session:
                     # Pokemon
@@ -162,7 +193,8 @@ async def run_seed(limit: int, offset: int, skip_moves: bool):
                             await session.commit()
                         except Exception as e:
                             await session.rollback()
-                            state.errors.append(f"pokemon/{name}: {e}")
+                            state["errors"].append(f"pokemon/{name}: {e}")
+                            await _write_state(state)
                             continue
                     else:
                         poke_data = await cache_svc.get_pokemon(session, name)
@@ -204,13 +236,15 @@ async def run_seed(limit: int, offset: int, skip_moves: bool):
                             await session.commit()
                         except Exception as e:
                             await session.rollback()
-                            state.errors.append(f"species/{name}: {e}")
+                            state["errors"].append(f"species/{name}: {e}")
+                            await _write_state(state)
 
             # ── 3. Abilities ──
-            state.current_step = f"Loading {len(all_abilities)} abilities …"
+            state["current_step"] = f"Loading {len(all_abilities)} abilities …"
+            await _write_state(state)
             async with AsyncSessionLocal() as session:
                 for ab_name in sorted(all_abilities):
-                    if state.status != "running":
+                    if await is_cancelled():
                         break
                     already = await session.execute(
                         select(SeedProgress).where(
@@ -228,14 +262,16 @@ async def run_seed(limit: int, offset: int, skip_moves: bool):
                         await session.commit()
                     except Exception as e:
                         await session.rollback()
-                        state.errors.append(f"ability/{ab_name}: {e}")
+                        state["errors"].append(f"ability/{ab_name}: {e}")
+                        await _write_state(state)
 
             # ── 4. Moves (optional) ──
             if not skip_moves:
-                state.current_step = f"Loading {len(all_moves)} moves …"
+                state["current_step"] = f"Loading {len(all_moves)} moves …"
+                await _write_state(state)
                 async with AsyncSessionLocal() as session:
                     for move_name in sorted(all_moves):
-                        if state.status != "running":
+                        if await is_cancelled():
                             break
                         already = await session.execute(
                             select(SeedProgress).where(
@@ -248,6 +284,29 @@ async def run_seed(limit: int, offset: int, skip_moves: bool):
                             continue
                         try:
                             data = await fetch_endpoint(client, "move", move_name)
+                            await cache_svc.save_move(session, data)
+                            session.add(SeedProgress(entity="move", name=move_name, status="done"))
+                            await session.commit()
+                        except Exception as e:
+                            await session.rollback()
+                            state["errors"].append(f"move/{move_name}: {e}")
+                            await _write_state(state)
+
+            current = await _read_state()
+            if current.get("status") == "running":
+                state["status"] = "done"
+                state["current_step"] = "Completed"
+                await _write_state(state)
+
+        except Exception as e:
+            state["status"] = "error"
+            state["current_step"] = f"Fatal error: {e}"
+            state["errors"].append(str(e))
+            await _write_state(state)
+
+        finally:
+            state["finished_at"] = datetime.now().isoformat()
+            await _write_state(state)
                             await cache_svc.save_move(session, data)
                             session.add(SeedProgress(entity="move", name=move_name, status="done"))
                             await session.commit()
@@ -290,12 +349,11 @@ async def start_seed(
 ):
     require_secret(x_admin_secret)
 
-    if seed_state.status == "running":
+    current = await _read_state()
+    if current.get("status") == "running":
         raise HTTPException(status_code=409, detail="Seed already running")
 
-    seed_state.reset()
-    seed_state.status = "running"
-    seed_state.started_at = datetime.now()
+    await _write_state({**_DEFAULT_STATE, "status": "running", "started_at": datetime.now().isoformat(), "errors": []})
 
     background_tasks.add_task(
         run_seed,
@@ -322,14 +380,15 @@ async def get_seed_status(
 ):
     require_secret(x_admin_secret)
 
+    state = await _read_state()
     return SeedStatusResponse(
-        status=seed_state.status,
-        started_at=seed_state.started_at,
-        finished_at=seed_state.finished_at,
-        current_step=seed_state.current_step,
-        progress=seed_state.progress,
-        total=seed_state.total,
-        errors=seed_state.errors[-20:],  # max 20 letzte Fehler
+        status=state.get("status", "idle"),
+        started_at=state.get("started_at"),
+        finished_at=state.get("finished_at"),
+        current_step=state.get("current_step", ""),
+        progress=state.get("progress", 0),
+        total=state.get("total", 0),
+        errors=state.get("errors", [])[-20:],
     )
 
 
@@ -343,12 +402,11 @@ async def cancel_seed(
 ):
     require_secret(x_admin_secret)
 
-    if seed_state.status != "running":
+    current = await _read_state()
+    if current.get("status") != "running":
         raise HTTPException(status_code=409, detail="No seed is currently running")
 
-    seed_state.status = "cancelled"
-    seed_state.finished_at = datetime.now()
-    seed_state.current_step = "Cancelled by user"
+    await _write_state({**current, "status": "cancelled", "finished_at": datetime.now().isoformat(), "current_step": "Cancelled by user"})
 
     return {"message": "Seed cancelled. Already cached data is preserved."}
 
