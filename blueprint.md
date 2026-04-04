@@ -12,6 +12,7 @@
 | Backend  | FastAPI 0.135, SQLAlchemy 2.0, asyncpg                               |
 | Caching  | Redis (L1) → PostgreSQL JSONB (L2) → PokeAPI (L3)                    |
 | Testing  | Vitest (Frontend, Zoneless Mode) · pytest + pytest-asyncio (Backend) |
+| Deploy   | GHCR (Docker Images) · GitHub Actions CI/CD · Unraid (Runtime)       |
 
 ---
 
@@ -118,6 +119,53 @@ App (root, RouterOutlet)
 --primary             // Dialog-Primärfarbe
 --glow                // Dialog-Glühen
 ```
+
+---
+
+## Phase 5 – Backend Tests ✅
+
+| Datei                         | Inhalt                                                                                | Tests |
+| ----------------------------- | ------------------------------------------------------------------------------------- | ----- |
+| `backend/tests/test_redis.py` | Alle Key-Builder-Funktionen (`key_pokemon_detail`, `key_filter`, `key_item` …)        | 16    |
+| `backend/tests/test_cache.py` | `get_pokemon`, `filter_pokemon`, `get_generation`, `get_item`, `get_stats`            | 13    |
+| `backend/tests/test_api.py`   | ListPokemon, GetPokemon, Compare, Stats, Generation, Item (End-to-End via TestClient) | 17    |
+
+**Muster:** `DATABASE_URL` env-Var wird in `conftest.py` gesetzt, _bevor_ die App importiert wird (SQLAlchemy liest beim Import). DB-Dependency wird mit `AsyncMock` überschrieben, Redis mit `patch.object`.
+
+---
+
+## Phase 6 – Deployment ✅
+
+### Kombinierter Container (Frontend + Backend in einem Image)
+
+```
+nginx (Port 80)
+├── /api/*  →  proxy_pass  →  gunicorn (127.0.0.1:8000)  →  FastAPI
+└── /*      →  Angular SPA (try_files → index.html)
+```
+
+| Datei                               | Zweck                                                                                                                                          |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Dockerfile` (root, 3-stufig)       | stage 1: `node:22-alpine` (ng build) · stage 2: `python:3.13-slim` (pip + `update-deps.sh`) · stage 3: Runtime (nginx + supervisor + gunicorn) |
+| `nginx-combined.conf`               | `/api/` → gunicorn, statische Assets (1y-Cache), SPA-Fallback                                                                                  |
+| `supervisord.conf`                  | Startet nginx (prio 10) + gunicorn (prio 20) als Kindprozesse                                                                                  |
+| `entrypoint-combined.sh`            | DB-Readiness-Check → `alembic upgrade head` → `supervisord`                                                                                    |
+| `.github/workflows/publish-app.yml` | pytest (46 Tests) → `docker buildx` → Push `ghcr.io/saez24/pokedex-app:latest`                                                                 |
+
+**Wichtige Änderungen:**
+
+- `frontend/src/app/shared/services/api/api.ts`: `apiUrl` von `https://pokeapi.co/api/v2/` auf `/api/v2/` (relativ – nginx proxiert intern)
+- `update-deps.sh` (`pip-review --auto`) wird im Builder-Stage bei _jedem_ Docker-Build ausgeführt
+- Separate `publish-backend.yml` + `publish-frontend.yml` gelöscht – komplett durch `publish-app.yml` ersetzt
+
+**Umgebungsvariablen (Runtime):**
+
+| Variable        | Beispiel                                           | Pflicht |
+| --------------- | -------------------------------------------------- | ------- |
+| `DATABASE_URL`  | `postgresql+asyncpg://user:pass@host:5432/pokedex` | ✅      |
+| `REDIS_URL`     | `redis://host:6379`                                | ✅      |
+| `ALLOWED_HOSTS` | `http://192.168.1.10`                              | ✅      |
+| `ADMIN_SECRET`  | `super-secret-token`                               | ✅      |
 
 ---
 
