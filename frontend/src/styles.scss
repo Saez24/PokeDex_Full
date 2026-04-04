@@ -510,3 +510,7 @@ html.light-theme app-pokemon-detail {
     border-color: var(--d-border);
   }
 }
+
+.cdk-virtual-scroll-content-wrapper {
+  padding-top: 40px !important;
+}
