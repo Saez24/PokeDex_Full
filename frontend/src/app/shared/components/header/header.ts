@@ -1,13 +1,13 @@
 import { Component, inject } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { PokemonService } from '../../services/pokemon/pokemon';
 import { MatIconModule } from '@angular/material/icon';
-import { App } from '../../../app';
 import { Theme } from '../../services/theme/theme';
 import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-header',
-  imports: [MatIconModule, MatSelectModule],
+  imports: [MatIconModule, MatSelectModule, RouterLink, RouterLinkActive],
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })

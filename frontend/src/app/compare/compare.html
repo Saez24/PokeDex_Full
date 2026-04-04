@@ -1,0 +1,164 @@
+<div class="cmp-page">
+
+    <!-- ── Header ── -->
+    <header class="cmp-header">
+        <a class="cmp-back" routerLink="/" i18n-aria-label aria-label="Back to Pokédex">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+            </svg>
+            <span i18n>Pokédex</span>
+        </a>
+        <div class="cmp-header-row">
+            <h1 class="cmp-title" i18n>Compare</h1>
+            @if (activePokemon().length > 0) {
+            <button class="cmp-clear-btn" (click)="clearAll()" i18n>Clear all</button>
+            }
+        </div>
+        <p class="cmp-subtitle" i18n>Compare up to 4 Pokémon side by side. Enter a name or ID.</p>
+    </header>
+
+    <!-- ── Slot cards (search / filled / loading) ── -->
+    <div class="cmp-slots">
+        @for (slot of slots(); track $index; let i = $index) {
+        <div class="cmp-slot" [class.cmp-slot--filled]="slot.pokemon !== null"
+            [style.--type-color]="slot.pokemon ? primaryTypeColor(slot.pokemon) : '#888'">
+
+            @if (slot.pokemon; as p) {
+            <!-- Filled card -->
+            <div class="cmp-card-header">
+                <div class="cmp-sprite-wrap">
+                    <img class="cmp-sprite" [src]="spriteUrl(p)" [alt]="p.name" loading="lazy" />
+                </div>
+                <button class="cmp-remove-btn" (click)="removePokemon(i)" i18n-aria-label aria-label="Remove">✕</button>
+            </div>
+            <div class="cmp-card-identity">
+                <div class="cmp-pokemon-name">{{ p.name }}</div>
+                <div class="cmp-pokemon-id">#{{ p.id.toString().padStart(3, '0') }}</div>
+                <div class="cmp-type-row">
+                    @for (t of p.types; track t.slot) {
+                    <span class="cmp-type-badge" [ngStyle]="{
+            background: TYPE_COLORS[t.type.name] + '28',
+            'border-color': TYPE_COLORS[t.type.name] + '55',
+            color: TYPE_COLORS[t.type.name]
+          }">{{ t.type.name }}</span>
+                    }
+                </div>
+            </div>
+
+            <!-- Physical info -->
+            <div class="cmp-meta">
+                <div class="cmp-meta-item">
+                    <span class="cmp-meta-label" i18n>Height</span>
+                    <span class="cmp-meta-val">{{ (p.height / 10).toFixed(1) }} m</span>
+                </div>
+                <div class="cmp-meta-item">
+                    <span class="cmp-meta-label" i18n>Weight</span>
+                    <span class="cmp-meta-val">{{ (p.weight / 10).toFixed(1) }} kg</span>
+                </div>
+                <div class="cmp-meta-item">
+                    <span class="cmp-meta-label" i18n>Exp</span>
+                    <span class="cmp-meta-val">{{ p.base_experience ?? '—' }}</span>
+                </div>
+            </div>
+
+            <!-- Stats bars -->
+            <div class="cmp-stats">
+                @for (statName of STAT_ORDER; track statName) {
+                @let val = getStat(p, statName);
+                <div class="cmp-stat-row">
+                    <div class="cmp-stat-label">{{ STAT_LABELS[statName] }}</div>
+                    <div class="cmp-stat-val">{{ val }}</div>
+                    <div class="cmp-stat-bar-bg">
+                        <div class="cmp-stat-bar-fill" [style.width.%]="(val / MAX_STAT) * 100"
+                            [style.background]="statBarColor(p, statName)">
+                        </div>
+                    </div>
+                </div>
+                }
+                <!-- Total -->
+                <div class="cmp-stat-row cmp-stat-row--total">
+                    <div class="cmp-stat-label" i18n>Total</div>
+                    <div class="cmp-stat-val cmp-stat-val--total">{{ totalStats(p) }}</div>
+                    <div class="cmp-stat-bar-bg">
+                        <div class="cmp-stat-bar-fill cmp-stat-bar-fill--total"
+                            [style.width.%]="(totalStats(p) / (MAX_STAT * 6)) * 100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            } @else if (slot.loading) {
+            <div class="cmp-slot-loading">
+                <div class="spinner"></div>
+            </div>
+
+            } @else {
+            <!-- Empty slot -->
+            <div class="cmp-slot-empty">
+                <div class="cmp-slot-num">{{ i + 1 }}</div>
+                <input class="cmp-input" type="text" [value]="searchInputs()[i]"
+                    (input)="updateInput(i, $any($event.target).value)" (keydown)="onInputKeydown($event, i)"
+                    placeholder="Name or ID…" i18n-placeholder aria-label="Enter Pokémon name or ID" i18n-aria-label />
+                @if (searchErrors()[i]) {
+                <div class="cmp-error">{{ searchErrors()[i] }}</div>
+                }
+                <button class="cmp-add-btn" (click)="addPokemon(i, searchInputs()[i])"
+                    [disabled]="!searchInputs()[i].trim()" i18n>Add</button>
+            </div>
+            }
+
+        </div>
+        }
+    </div>
+
+    <!-- ── Stat comparison table (only when ≥2 pokemon) ── -->
+    @if (activePokemon().length >= 2) {
+    <section class="cmp-table-section">
+        <h2 class="cmp-table-title" i18n>Stat Comparison</h2>
+        <div class="cmp-table-wrap">
+            <table class="cmp-table">
+                <thead>
+                    <tr>
+                        <th class="cmp-th cmp-th--stat" i18n>Stat</th>
+                        @for (p of activePokemon(); track p.id) {
+                        <th class="cmp-th" [style.color]="primaryTypeColor(p)">{{ p.name }}</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (statName of STAT_ORDER; track statName) {
+                    <tr class="cmp-tr">
+                        <td class="cmp-td cmp-td--label">{{ STAT_LABELS[statName] }}</td>
+                        @for (p of activePokemon(); track p.id) {
+                        @let val = getStat(p, statName);
+                        @let isMax = val === statMaxima()[statName] && activePokemon().length > 1;
+                        <td class="cmp-td" [class.cmp-td--winner]="isMax">
+                            <div class="cmp-td-inner">
+                                <span class="cmp-td-val">{{ val }}</span>
+                                <div class="cmp-td-bar-bg">
+                                    <div class="cmp-td-bar-fill" [style.width.%]="(val / MAX_STAT) * 100"
+                                        [style.background]="statBarColor(p, statName)">
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        }
+                    </tr>
+                    }
+                    <!-- Total row -->
+                    <tr class="cmp-tr cmp-tr--total">
+                        <td class="cmp-td cmp-td--label" i18n>Total</td>
+                        @for (p of activePokemon(); track p.id) {
+                        @let total = totalStats(p);
+                        @let isMaxTotal = total === maxTotalStats() && activePokemon().length > 1;
+                        <td class="cmp-td cmp-td--total" [class.cmp-td--winner]="isMaxTotal">{{ total }}</td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    }
+
+</div>

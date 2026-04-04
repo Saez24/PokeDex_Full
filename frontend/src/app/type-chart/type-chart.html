@@ -1,0 +1,159 @@
+<div class="tc-page">
+
+    <!-- ── Header ── -->
+    <header class="tc-header">
+        <a class="tc-back" routerLink="/" i18n-aria-label aria-label="Back to Pokédex">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+            </svg>
+            <span i18n>Pokédex</span>
+        </a>
+        <h1 class="tc-title" i18n>Type Chart</h1>
+        <p class="tc-subtitle" i18n>Tap an attacker row or defender column to see matchup details</p>
+    </header>
+
+    <!-- ── Legend ── -->
+    <div class="tc-legend">
+        <span class="tc-legend-item tc-super" i18n>2× Super Effective</span>
+        <span class="tc-legend-item tc-resist" i18n>½× Not Very Effective</span>
+        <span class="tc-legend-item tc-immune" i18n>✕ Immune</span>
+        <span class="tc-legend-item tc-normal" i18n>1× Normal</span>
+    </div>
+
+    <!-- ── Detail panel ── -->
+    @if (selectedAttacker() || selectedDefender()) {
+    <div class="tc-detail">
+        @if (selectedAttacker(); as a) {
+        <div class="tc-detail-title" [ngStyle]="{ color: TYPE_COLORS[a] }">
+            {{ a | titlecase }}
+            <span i18n>as Attacker</span>
+        </div>
+        <div class="tc-detail-row">
+            <span class="tc-detail-label tc-super-label" i18n>Super Effective vs</span>
+            <div class="tc-detail-chips">
+                @for (t of attackerSuperEffective(); track t) {
+                <span class="tc-chip"
+                    [ngStyle]="{ background: TYPE_COLORS[t] + '25', 'border-color': TYPE_COLORS[t] + '60', color: TYPE_COLORS[t] }">{{
+                    t }}</span>
+                }
+                @if (!attackerSuperEffective().length) { <span class="tc-detail-none">—</span> }
+            </div>
+        </div>
+        <div class="tc-detail-row">
+            <span class="tc-detail-label tc-resist-label" i18n>Resisted by</span>
+            <div class="tc-detail-chips">
+                @for (t of attackerResisted(); track t) {
+                <span class="tc-chip"
+                    [ngStyle]="{ background: TYPE_COLORS[t] + '25', 'border-color': TYPE_COLORS[t] + '60', color: TYPE_COLORS[t] }">{{
+                    t }}</span>
+                }
+                @if (!attackerResisted().length) { <span class="tc-detail-none">—</span> }
+            </div>
+        </div>
+        <div class="tc-detail-row">
+            <span class="tc-detail-label tc-immune-label" i18n>No Effect vs</span>
+            <div class="tc-detail-chips">
+                @for (t of attackerImmune(); track t) {
+                <span class="tc-chip"
+                    [ngStyle]="{ background: TYPE_COLORS[t] + '25', 'border-color': TYPE_COLORS[t] + '60', color: TYPE_COLORS[t] }">{{
+                    t }}</span>
+                }
+                @if (!attackerImmune().length) { <span class="tc-detail-none">—</span> }
+            </div>
+        </div>
+        }
+
+        @if (selectedDefender(); as d) {
+        <div class="tc-detail-title" [ngStyle]="{ color: TYPE_COLORS[d] }">
+            {{ d | titlecase }}
+            <span i18n>as Defender</span>
+        </div>
+        <div class="tc-detail-row">
+            <span class="tc-detail-label tc-super-label" i18n>Weak to</span>
+            <div class="tc-detail-chips">
+                @for (t of defenderWeaknesses(); track t) {
+                <span class="tc-chip"
+                    [ngStyle]="{ background: TYPE_COLORS[t] + '25', 'border-color': TYPE_COLORS[t] + '60', color: TYPE_COLORS[t] }">{{
+                    t }}</span>
+                }
+                @if (!defenderWeaknesses().length) { <span class="tc-detail-none">—</span> }
+            </div>
+        </div>
+        <div class="tc-detail-row">
+            <span class="tc-detail-label tc-resist-label" i18n>Resistant to</span>
+            <div class="tc-detail-chips">
+                @for (t of defenderResistances(); track t) {
+                <span class="tc-chip"
+                    [ngStyle]="{ background: TYPE_COLORS[t] + '25', 'border-color': TYPE_COLORS[t] + '60', color: TYPE_COLORS[t] }">{{
+                    t }}</span>
+                }
+                @if (!defenderResistances().length) { <span class="tc-detail-none">—</span> }
+            </div>
+        </div>
+        <div class="tc-detail-row">
+            <span class="tc-detail-label tc-immune-label" i18n>Immune to</span>
+            <div class="tc-detail-chips">
+                @for (t of defenderImmunities(); track t) {
+                <span class="tc-chip"
+                    [ngStyle]="{ background: TYPE_COLORS[t] + '25', 'border-color': TYPE_COLORS[t] + '60', color: TYPE_COLORS[t] }">{{
+                    t }}</span>
+                }
+                @if (!defenderImmunities().length) { <span class="tc-detail-none">—</span> }
+            </div>
+        </div>
+        }
+    </div>
+    }
+
+    <!-- ── Matrix table ── -->
+    <div class="tc-scroll-wrap">
+        <table class="tc-table" role="grid" aria-label="Type effectiveness chart">
+            <thead>
+                <tr>
+                    <!-- Corner cell -->
+                    <th class="tc-corner-cell" scope="col">
+                        <span class="tc-atk-label" i18n>ATK ↓</span>
+                        <span class="tc-def-label" i18n>DEF →</span>
+                    </th>
+                    <!-- Defending type headers -->
+                    @for (defType of TYPES; track defType; let di = $index) {
+                    <th class="tc-col-header" scope="col" [class.tc-col-highlighted]="isColHighlighted(di)"
+                        [ngStyle]="{ '--type-color': TYPE_COLORS[defType] }" (click)="setDefender(defType)"
+                        role="columnheader" [attr.aria-label]="defType + ' defender'"
+                        [attr.aria-selected]="isColHighlighted(di)">
+                        <a class="tc-type-label tc-type-link" [routerLink]="['/type', defType]"
+                            (click)="$event.stopPropagation()">{{ defType }}</a>
+                    </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @for (atkType of TYPES; track atkType; let ai = $index) {
+                <tr [class.tc-row-highlighted]="isRowHighlighted(ai)">
+                    <!-- Attacking type header -->
+                    <th class="tc-row-header" scope="row" [class.tc-row-highlighted]="isRowHighlighted(ai)"
+                        [ngStyle]="{ '--type-color': TYPE_COLORS[atkType] }" (click)="setAttacker(atkType)"
+                        role="rowheader" [attr.aria-label]="atkType + ' attacker'"
+                        [attr.aria-selected]="isRowHighlighted(ai)">
+                        <a class="tc-type-label tc-type-link" [routerLink]="['/type', atkType]"
+                            (click)="$event.stopPropagation()">{{ atkType }}</a>
+                    </th>
+                    <!-- Cells -->
+                    @for (defType of TYPES; track defType; let di = $index) {
+                    @let value = eff(ai, di);
+                    <td class="tc-cell" [class.tc-cell-super]="value === 2" [class.tc-cell-resist]="value === 0.5"
+                        [class.tc-cell-immune]="value === 0"
+                        [class.tc-cell-dimmed]="(selectedAttacker() && !isRowHighlighted(ai)) || (selectedDefender() && !isColHighlighted(di))"
+                        [attr.aria-label]="atkType + ' vs ' + defType + ': ' + value + 'x'">
+                        <span class="tc-cell-val" [ngStyle]="{ color: cellTextColor(value) }">
+                            {{ cellText(value) }}
+                        </span>
+                    </td>
+                    }
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

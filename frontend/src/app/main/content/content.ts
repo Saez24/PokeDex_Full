@@ -2,16 +2,20 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   ElementRef,
   inject,
+  OnDestroy,
   OnInit,
   signal,
+  ViewChild,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NgStyle } from '@angular/common';
+import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import {
   getPrimaryColor,
   getPrimaryGlow,
@@ -21,24 +25,44 @@ import {
 import { PokemonDialog } from '../pokemon-dialog/pokemon-dialog';
 import { PokemonService, GENERATIONS } from '../../shared/services/pokemon/pokemon';
 import { FavoritesService } from '../../shared/services/favorites/favorites';
+import { SeoService } from '../../shared/services/seo/seo';
 import { Pokemon } from '../../shared/models/pokemon.model';
 
 @Component({
   selector: 'app-content',
-  imports: [MatButtonModule, MatProgressSpinnerModule, NgStyle],
+  imports: [MatButtonModule, MatProgressSpinnerModule, NgStyle, ScrollingModule],
   templateUrl: './content.html',
   styleUrl: './content.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Content implements OnInit, AfterViewInit {
+export class Content implements OnInit, AfterViewInit, OnDestroy {
   private dialog = inject(MatDialog);
   private observer!: IntersectionObserver;
+  private resizeObserver!: ResizeObserver;
   readonly pokemonService = inject(PokemonService);
   readonly favoritesService = inject(FavoritesService);
+  private readonly seoService = inject(SeoService);
   readonly TYPE_COLORS = TYPE_COLORS;
   readonly STAT_LABELS = STAT_LABELS;
   readonly GENERATIONS = GENERATIONS;
   readonly ALL_TYPES = Object.keys(TYPE_COLORS);
+  readonly ITEM_SIZE = 270; // card height (260px) + gap (10px)
+
+  @ViewChild(CdkVirtualScrollViewport) viewport?: CdkVirtualScrollViewport;
+
+  /** Number of grid columns — updated on resize */
+  private readonly cols = signal(this.calcCols());
+
+  /** Filtered pokemon grouped into rows */
+  readonly pokemonRows = computed(() => {
+    const n = this.cols();
+    const items = this.pokemonService.filteredPokemon();
+    const rows: Pokemon[][] = [];
+    for (let i = 0; i < items.length; i += n) {
+      rows.push(items.slice(i, i + n));
+    }
+    return rows;
+  });
 
   constructor(private el: ElementRef) {
     this.initObserver();
@@ -53,7 +77,15 @@ export class Content implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.seoService.setPage({
+      title: 'PokéDex – Alle Pokémon',
+      description: 'Entdecke alle Pokémon – Stats, Typen, Moves und mehr.',
+    });
     this.pokemonService.loadMore();
+    this.resizeObserver = new ResizeObserver(() => {
+      this.cols.set(this.calcCols());
+    });
+    this.resizeObserver.observe(document.body);
   }
 
   ngAfterViewInit() {
@@ -107,6 +139,30 @@ export class Content implements OnInit, AfterViewInit {
     }, 50);
   }
 
+  /** Called by cdkVirtualFor scrolledIndexChange — auto-loads when near bottom */
+  onScrollIndex(firstVisible: number): void {
+    const rows = this.pokemonRows();
+    if (
+      firstVisible + 15 >= rows.length &&
+      this.pokemonService.hasMore() &&
+      !this.pokemonService.loading()
+    ) {
+      this.pokemonService.loadMore();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.observer?.disconnect();
+    this.resizeObserver?.disconnect();
+  }
+
+  private calcCols(): number {
+    const w = window.innerWidth;
+    if (w < 600) return 2;
+    if (w < 900) return 3;
+    return 4;
+  }
+
   onSearch(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.pokemonService.searchQuery.set(value);
@@ -147,5 +203,9 @@ export class Content implements OnInit, AfterViewInit {
 
   trackById(_: number, p: Pokemon): number {
     return p.id;
+  }
+
+  trackRow(_: number, row: Pokemon[]): number {
+    return row[0]?.id ?? _;
   }
 }

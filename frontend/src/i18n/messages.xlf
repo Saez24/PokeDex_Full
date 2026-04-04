@@ -1,0 +1,1110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en-US" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="7605023413597783566" datatype="html">
+        <source>Back to Pokédex</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/compare/compare.html</context>
+          <context context-type="linenumber">5,6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">5,6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">14,15</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">5,6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">5,6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5834163573683536178" datatype="html">
+        <source>Pokédex</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/compare/compare.html</context>
+          <context context-type="linenumber">10,11</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">10,11</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">27,28</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">10,11</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">10,11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2572999724448976084" datatype="html">
+        <source>Compare</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/compare/compare.html</context>
+          <context context-type="linenumber">13,14</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/header/header.html</context>
+          <context context-type="linenumber">36,37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2303489635985691360" datatype="html">
+        <source>Clear all</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/compare/compare.html</context>
+          <context context-type="linenumber">15,16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6455779176456634666" datatype="html">
+        <source>Compare up to 4 Pokémon side by side. Enter a name or ID.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/compare/compare.html</context>
+          <context context-type="linenumber">18,19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4814285799071780083" datatype="html">
+        <source>Remove</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/compare/compare.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3033623772164647792" datatype="html">
+        <source>Height</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/compare/compare.html</context>
+          <context context-type="linenumber">52,53</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">105,106</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">94,95</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5848348023107769657" datatype="html">
+        <source>Weight</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/compare/compare.html</context>
+          <context context-type="linenumber">56,57</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">109,110</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">98,99</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5690995252206024293" datatype="html">
+        <source>Exp</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/compare/compare.html</context>
+          <context context-type="linenumber">60,61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3448462145758383019" datatype="html">
+        <source>Total</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/compare/compare.html</context>
+          <context context-type="linenumber">81,82</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/compare/compare.html</context>
+          <context context-type="linenumber">151,152</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8809147864458866465" datatype="html">
+        <source>Name or ID…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/compare/compare.html</context>
+          <context context-type="linenumber">102</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2658651164009802273" datatype="html">
+        <source>Enter Pokémon name or ID</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/compare/compare.html</context>
+          <context context-type="linenumber">102</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3249513483374643425" datatype="html">
+        <source>Add</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/compare/compare.html</context>
+          <context context-type="linenumber">107,108</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">65,66</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8632743032857086018" datatype="html">
+        <source>Stat Comparison</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/compare/compare.html</context>
+          <context context-type="linenumber">118,119</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7652319011121347113" datatype="html">
+        <source>Stat</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/compare/compare.html</context>
+          <context context-type="linenumber">123,124</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4980782590900030707" datatype="html">
+        <source>All Pokémon.<x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br /&gt;"/>In one place.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/content/content.html</context>
+          <context context-type="linenumber">5,6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2075740658697065084" datatype="html">
+        <source>Discover and explore the entire Pokémon world.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/content/content.html</context>
+          <context context-type="linenumber">6,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8326336517324029685" datatype="html">
+        <source>Search by name or #ID…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/content/content.html</context>
+          <context context-type="linenumber">18,19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2986724018283476355" datatype="html">
+        <source>Filter by type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/content/content.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="565606266379309262" datatype="html">
+        <source>All Types</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/content/content.html</context>
+          <context context-type="linenumber">25,26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4080442553606292819" datatype="html">
+        <source>Show favorites only</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/content/content.html</context>
+          <context context-type="linenumber">33,34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4085930761302974863" datatype="html">
+        <source>Favorites</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/content/content.html</context>
+          <context context-type="linenumber">35,36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="105462679807945360" datatype="html">
+        <source>Filter by generation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/content/content.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4665451070906079743" datatype="html">
+        <source>Favorited</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/content/content.html</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2823017928928217708" datatype="html">
+        <source>No Pokémon found. Try a different search.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/content/content.html</context>
+          <context context-type="linenumber">108,109</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5098940928632925274" datatype="html">
+        <source>Toggle shiny sprite</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1422876263152657637" datatype="html">
+        <source>Play Pokémon cry</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5065386170660716603" datatype="html">
+        <source>Open detail page</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">30,31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6398969587818603892" datatype="html">
+        <source>Close dialog</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">41,42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2302164786226992132" datatype="html">
+        <source>Base form</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">83,84</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5644861690099012817" datatype="html">
+        <source>Base-Exp</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">113,114</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">102,103</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8527461369219816872" datatype="html">
+        <source>Base Stats</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">119,120</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">108,109</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="264667193713896049" datatype="html">
+        <source>Abilities</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">134,135</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">123,124</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7054829409324166420" datatype="html">
+        <source>hidden</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">142,143</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3702051661484773517" datatype="html">
+        <source>Breeding</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">155,156</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">142,143</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1065848435606861062" datatype="html">
+        <source>Egg Groups</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">159,160</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">145,146</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7791703808390990561" datatype="html">
+        <source>Hatch Steps</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">167,168</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">149,150</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3948439187870398089" datatype="html">
+        <source>Gender</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">173,174</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">154,155</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">160,161</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3574634469314397645" datatype="html">
+        <source>Genderless</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">180,181</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">161,162</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7204447982409936878" datatype="html">
+        <source>Growth Rate</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">186,187</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">165,166</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4888164441328740252" datatype="html">
+        <source>Load Evolution …</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">202,203</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5710288153432512545" datatype="html">
+        <source>This Pokémon does not evolve.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">206,207</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">185,186</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6310605044014926766" datatype="html">
+        <source>Level-up</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">248,249</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">224,225</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4646020212117969098" datatype="html">
+        <source>Egg</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">252,253</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">228,229</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5945091488054189072" datatype="html">
+        <source>Loading moves …</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">258,259</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">234,235</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4414690095572309113" datatype="html">
+        <source>Open this tab to load moves.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">264,265</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">239,240</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8177782284752672617" datatype="html">
+        <source>No TM/HM moves found.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">270,271</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">244,245</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5030232689448587087" datatype="html">
+        <source>No Egg moves found.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">276,277</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">249,250</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5107271000183977938" datatype="html">
+        <source> No additional effect information available. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main/pokemon-dialog/pokemon-dialog.html</context>
+          <context context-type="linenumber">354,355</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9046386670401046502" datatype="html">
+        <source>Move Encyclopedia</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">13,14</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/header/header.html</context>
+          <context context-type="linenumber">39,40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4345311303930833558" datatype="html">
+        <source>All Pokémon moves with details. Click a row to expand.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">16,17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3610274923365635564" datatype="html">
+        <source>Search moves…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8045571366200046412" datatype="html">
+        <source>Search moves</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="424356320420294719" datatype="html">
+        <source>All types</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">33,34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9079939251545460127" datatype="html">
+        <source>Filter by damage class</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7268766783908999400" datatype="html">
+        <source>All classes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">41,42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2354817630223808522" datatype="html">
+        <source>Move</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">53,54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8650499415827640724" datatype="html">
+        <source>Type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">54,55</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">257,258</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4378796785985219718" datatype="html">
+        <source>Class</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">55,56</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5690241527890097775" datatype="html">
+        <source>Power</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">56,57</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">140,141</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">286,287</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5035111678551015062" datatype="html">
+        <source>Acc.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">57,58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5853048254321426214" datatype="html">
+        <source>PP</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">150,151</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4628079966849767782" datatype="html">
+        <source><x id="START_BLOCK_IF" equiv-text="@if (pageLoading()) {"/> Loading… <x id="CLOSE_BLOCK_IF" equiv-text="}"/><x id="START_BLOCK_ELSE" equiv-text="@else {"/> Load more moves <x id="CLOSE_BLOCK_ELSE" equiv-text="}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">107,109</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5564086240468341122" datatype="html">
+        <source>Close detail</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">114,115</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7819314041543176992" datatype="html">
+        <source>Close</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">118</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3263044568795523288" datatype="html">
+        <source>Accuracy</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">144,145</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">290,291</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3788161096321650454" datatype="html">
+        <source>Effect</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/moves/moves.html</context>
+          <context context-type="linenumber">156,157</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3621734870351036490" datatype="html">
+        <source>Loading Pokémon …</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">7,8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2041190252749958982" datatype="html">
+        <source>Could not load Pokémon data.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">13,14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8890553633144307762" datatype="html">
+        <source>Back</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9172281590078124347" datatype="html">
+        <source>Toggle favorite</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4088311569349098646" datatype="html">
+        <source>Stats</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="996392855508119363" datatype="html">
+        <source>Hidden</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">131,132</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="172785434800035727" datatype="html">
+        <source>Evolution</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">176,177</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8809979115513034744" datatype="html">
+        <source>Loading evolution …</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">181,182</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6313141179989459041" datatype="html">
+        <source>Moves</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">219</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/header/header.html</context>
+          <context context-type="linenumber">48,49</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8953033926734869941" datatype="html">
+        <source>Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">256,257</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1806667489382256324" datatype="html">
+        <source>Category</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">294,295</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7113712050879726034" datatype="html">
+        <source>No additional effect information available. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/pokemon-detail/pokemon-detail.html</context>
+          <context context-type="linenumber">303,304</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6830212033729191585" datatype="html">
+        <source>Your complete Pokémon reference</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/footer/footer.html</context>
+          <context context-type="linenumber">5,6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="168019314463703246" datatype="html">
+        <source>Open PokéAPI website</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/footer/footer.html</context>
+          <context context-type="linenumber">10,11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5800941126648345851" datatype="html">
+        <source>Open GitHub repository</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/footer/footer.html</context>
+          <context context-type="linenumber">21,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="947954863326632466" datatype="html">
+        <source>Data provided by</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/footer/footer.html</context>
+          <context context-type="linenumber">31,32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2800705005019815622" datatype="html">
+        <source>Pokémon and all related names are trademarks of Nintendo.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/footer/footer.html</context>
+          <context context-type="linenumber">33,34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3892301997495250320" datatype="html">
+        <source>Type Chart</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/header/header.html</context>
+          <context context-type="linenumber">7,8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/header/header.html</context>
+          <context context-type="linenumber">15,16</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">12,13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">10,11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4809339899322746177" datatype="html">
+        <source>Team Builder</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/header/header.html</context>
+          <context context-type="linenumber">18,19</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">13,14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3724068243287682962" datatype="html">
+        <source>Team</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/header/header.html</context>
+          <context context-type="linenumber">26,27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5422549483774967043" datatype="html">
+        <source>Compare Pokémon</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/components/header/header.html</context>
+          <context context-type="linenumber">29,30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8700121026680200191" datatype="html">
+        <source>Clear</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">15,16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="225977037747487779" datatype="html">
+        <source>Build a team of up to 6 Pokémon. Enter a name or ID in each slot.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">18,19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6540826083992771219" datatype="html">
+        <source>Remove Pokémon</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5743393022142778612" datatype="html">
+        <source>Team Weaknesses</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">79,80</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3896748215358365594" datatype="html">
+        <source>Average damage taken from each attacking type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">80,81</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4176946494171671859" datatype="html">
+        <source>No common weaknesses — great team!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">93,94</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="23269282051641471" datatype="html">
+        <source>Coverage Gaps</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">100,101</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3402718987972869925" datatype="html">
+        <source>Types your team cannot hit super-effectively</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">101,102</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3437523239418326053" datatype="html">
+        <source>Full type coverage — excellent!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">114,115</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8063698326313363076" datatype="html">
+        <source>Share team:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">123,124</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4323470180912194028" datatype="html">
+        <source>Copy</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/team-builder/team-builder.html</context>
+          <context context-type="linenumber">125,126</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3095164139254846783" datatype="html">
+        <source>Tap an attacker row or defender column to see matchup details</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">13,14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2040100161808054097" datatype="html">
+        <source>2× Super Effective</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">18,19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8314725797637966390" datatype="html">
+        <source>½× Not Very Effective</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">19,20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6935153007685168431" datatype="html">
+        <source>✕ Immune</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">20,21</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3165945760819727641" datatype="html">
+        <source>1× Normal</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">21,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2435172431030491517" datatype="html">
+        <source>as Attacker</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">30,31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5969701495817755608" datatype="html">
+        <source>Super Effective vs</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">33,34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7675048899875531656" datatype="html">
+        <source>Resisted by</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">44,45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2654400836143003762" datatype="html">
+        <source>No Effect vs</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">55,56</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5048571785860089324" datatype="html">
+        <source>as Defender</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">70,71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5298831121422531210" datatype="html">
+        <source>Weak to</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">73,74</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">46,47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5118929865006682877" datatype="html">
+        <source>Resistant to</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">84,85</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">57,58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8972911104527627044" datatype="html">
+        <source>Immune to</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">95,96</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">68,69</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3152868103032812993" datatype="html">
+        <source>ATK ↓</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">116,117</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="566700572844891074" datatype="html">
+        <source>DEF →</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-chart/type-chart.html</context>
+          <context context-type="linenumber">117,118</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6465689542040685920" datatype="html">
+        <source>Back to Type Chart</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">5,6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2250033520587956748" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{ pokemonCount() }}"/> Pokémon</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">22,23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2831893706711154540" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{ movesCount() }}"/> Moves</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">23,24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2065690022242268979" datatype="html">
+        <source>Could not load type data. Check your connection.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">36,37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6252070156626006029" datatype="html">
+        <source>None</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">54,55</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">65,66</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">76,77</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">90,91</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">101,102</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">112,113</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="989846293258190425" datatype="html">
+        <source>Super effective against</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">82,83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4899253721455852856" datatype="html">
+        <source>Not very effective against</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">93,94</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8998404200582929262" datatype="html">
+        <source>No effect against</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">104,105</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7567823385608205505" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{ typeName() | titlecase }}"/>-Type Pokémon</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">120,121</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7087337661541913888" datatype="html">
+        <source>Primary type only · sorted by Pokédex number</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">121,123</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7215101881367554791" datatype="html">
+        <source>Show more</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/type-detail/type-detail.html</context>
+          <context context-type="linenumber">135,136</context>
+        </context-group>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

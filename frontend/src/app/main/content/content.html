@@ -49,84 +49,71 @@
   }
 </div>
 
-<!-- ── Grid ── -->
-<main class="grid" role="list" aria-label="Pokémon list" i18n-aria-label>
-  @for (p of pokemonService.filteredPokemon(); track trackById($index, p)) {
-  <div class="card reveal" role="listitem"
-    [ngStyle]="{ '--card-glow': primaryGlow(p), '--card-color': primaryColor(p) }" (click)="openDialog(p)"
-    (keydown.enter)="openDialog(p)" (keydown.space)="openDialog(p)" tabindex="0"
-    [attr.aria-label]="pokemonService.getLocalizedName(p.species) + ', #' + paddedId(p.id)">
-    <!-- Top row -->
-    <div class="card-top">
-      <span class="card-num">#{{ paddedId(p.id) }}</span>
-      <div class="card-dots">
-        @for (t of p.types; track t.slot) {
-        <span class="type-dot" [ngStyle]="{
-                background: TYPE_COLORS[t.type.name],
-                'box-shadow': '0 0 6px ' + TYPE_COLORS[t.type.name],
-              }"></span>
-        }
-      </div>
-      <!-- Favorite indicator -->
-      @if (favoritesService.isFavorite(p.id)) {
-      <span class="card-fav" aria-label="Favorited" i18n-aria-label>♥</span>
-      }
-    </div>
+<!-- ── Virtual scroll grid ── -->
+<cdk-virtual-scroll-viewport class="virtual-viewport" [itemSize]="ITEM_SIZE"
+  (scrolledIndexChange)="onScrollIndex($event)">
 
-    <!-- Sprite -->
-    <div class="card-art">
-      <img class="card-sprite" [src]="spriteUrl(p)" [alt]="p.name" loading="lazy" />
-    </div>
-
-    <!-- Info -->
-    <div class="card-bottom">
-      <div class="card-name">{{ pokemonService.getLocalizedName(p.species) }}</div>
-      <div class="card-type-label">
-        {{ pokemonService.getLocalizedTypes(p).join(' · ') }}
-      </div>
-
-      <!-- Mini stat bars -->
-      <div class="card-stats">
-        @for (stat of p.stats.slice(0, 3); track stat.stat.name) {
-        <div class="stat-micro">
-          <span class="stat-micro-label">{{ STAT_LABELS[stat.stat.name] }}</span>
-          <div class="stat-micro-track">
-            <div class="stat-micro-fill" [ngStyle]="{ width: statPercent(stat.base_stat) + '%' }"></div>
-          </div>
+  <div *cdkVirtualFor="let row of pokemonRows(); trackBy: trackRow" class="grid-row" [style.height.px]="ITEM_SIZE">
+    @for (p of row; track p.id) {
+    <div class="card" role="listitem" [ngStyle]="{ '--card-glow': primaryGlow(p), '--card-color': primaryColor(p) }"
+      (click)="openDialog(p)" (keydown.enter)="openDialog(p)" (keydown.space)="openDialog(p)" tabindex="0"
+      [attr.aria-label]="pokemonService.getLocalizedName(p.species) + ', #' + paddedId(p.id)">
+      <!-- Top row -->
+      <div class="card-top">
+        <span class="card-num">#{{ paddedId(p.id) }}</span>
+        <div class="card-dots">
+          @for (t of p.types; track t.slot) {
+          <span class="type-dot" [ngStyle]="{
+                  background: TYPE_COLORS[t.type.name],
+                  'box-shadow': '0 0 6px ' + TYPE_COLORS[t.type.name],
+                }"></span>
+          }
         </div>
+        @if (favoritesService.isFavorite(p.id)) {
+        <span class="card-fav" aria-label="Favorited" i18n-aria-label>♥</span>
         }
       </div>
+      <!-- Sprite -->
+      <div class="card-art">
+        <img class="card-sprite" [src]="spriteUrl(p)" [alt]="p.name" loading="lazy" />
+      </div>
+      <!-- Info -->
+      <div class="card-bottom">
+        <div class="card-name">{{ pokemonService.getLocalizedName(p.species) }}</div>
+        <div class="card-type-label">
+          {{ pokemonService.getLocalizedTypes(p).join(' · ') }}
+        </div>
+        <div class="card-stats">
+          @for (stat of p.stats.slice(0, 3); track stat.stat.name) {
+          <div class="stat-micro">
+            <span class="stat-micro-label">{{ STAT_LABELS[stat.stat.name] }}</span>
+            <div class="stat-micro-track">
+              <div class="stat-micro-fill" [ngStyle]="{ width: statPercent(stat.base_stat) + '%' }"></div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
     </div>
+    }
   </div>
-  }
 
-  <!-- No results -->
-  @if (!pokemonService.loading() && pokemonService.filteredPokemon().length === 0 && pokemonService.pokemon().length >
-  0) {
-  <div class="no-results">
-    <div class="no-results-icon">🔍</div>
-    <p i18n>No Pokémon found. Try a different search.</p>
-  </div>
-  }
+</cdk-virtual-scroll-viewport>
 
-  <!-- Skeleton cards while loading -->
-  @if (pokemonService.loading()) {
+<!-- No results (outside viewport) -->
+@if (!pokemonService.loading() && pokemonService.filteredPokemon().length === 0 && pokemonService.pokemon().length > 0)
+{
+<div class="no-results">
+  <div class="no-results-icon">🔍</div>
+  <p i18n>No Pokémon found. Try a different search.</p>
+</div>
+}
+
+<!-- Loading spinner (initial load) -->
+@if (pokemonService.loading() && pokemonService.pokemon().length === 0) {
+<div class="initial-loading">
   @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
   <div class="card skeleton" aria-hidden="true"></div>
   }
-  }
-</main>
-
-<!-- ── Load More ── -->
-@if (pokemonService.hasMore() && !pokemonService.searchQuery() && !pokemonService.selectedType()) {
-<div class="load-wrap">
-  <button class="load-btn" [disabled]="pokemonService.loading()" (click)="loadMore()">
-    @if (pokemonService.loading()) {
-    <mat-spinner diameter="18" strokeWidth="2" />
-    } @else {
-    <span i18n>Load More</span>
-    }
-  </button>
-  <span id="load-hint" i18n class="load-hint">Load 20 more Pokémon</span>
 </div>
 }

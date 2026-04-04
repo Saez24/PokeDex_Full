@@ -1,0 +1,162 @@
+<div class="mv-page">
+
+    <!-- ── Header ── -->
+    <header class="mv-header">
+        <a class="mv-back" routerLink="/" i18n-aria-label aria-label="Back to Pokédex">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+            </svg>
+            <span i18n>Pokédex</span>
+        </a>
+        <div class="mv-header-row">
+            <h1 class="mv-title" i18n>Move Encyclopedia</h1>
+            <span class="mv-count">{{ filteredMoves().length }}&thinsp;/&thinsp;{{ totalCount() }}</span>
+        </div>
+        <p class="mv-subtitle" i18n>All Pokémon moves with details. Click a row to expand.</p>
+    </header>
+
+    <!-- ── Filters ── -->
+    <div class="mv-filters">
+        <div class="mv-search-wrap">
+            <svg class="mv-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5" stroke-linecap="round">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input class="mv-search" type="search" placeholder="Search moves…" i18n-placeholder [value]="searchQuery()"
+                (input)="setSearch($any($event.target).value)" aria-label="Search moves" i18n-aria-label />
+        </div>
+
+        <select class="mv-select" [value]="filterType()" (change)="filterType.set($any($event.target).value)"
+            aria-label="Filter by type" i18n-aria-label>
+            <option value="" i18n>All types</option>
+            @for (t of TYPES; track t) {
+            <option [value]="t">{{ t | titlecase }}</option>
+            }
+        </select>
+
+        <select class="mv-select" [value]="filterClass()" (change)="filterClass.set($any($event.target).value)"
+            aria-label="Filter by damage class" i18n-aria-label>
+            <option value="" i18n>All classes</option>
+            @for (c of DAMAGE_CLASSES; track c) {
+            <option [value]="c">{{ c | titlecase }}</option>
+            }
+        </select>
+    </div>
+
+    <!-- ── Table ── -->
+    <div class="mv-table-wrap">
+        <table class="mv-table" aria-label="Move list">
+            <thead>
+                <tr>
+                    <th class="mv-th" i18n>Move</th>
+                    <th class="mv-th mv-th--center" i18n>Type</th>
+                    <th class="mv-th mv-th--center" i18n>Class</th>
+                    <th class="mv-th mv-th--center" i18n>Power</th>
+                    <th class="mv-th mv-th--center" i18n>Acc.</th>
+                    <th class="mv-th mv-th--center" i18n>PP</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (m of filteredMoves(); track m.name) {
+                <tr class="mv-tr" (click)="selectMove(m.name)" tabindex="0" (keydown.enter)="selectMove(m.name)"
+                    (keydown.space)="selectMove(m.name); $event.preventDefault()">
+                    <td class="mv-td mv-td--name">{{ m.name | titlecase }}</td>
+                    <td class="mv-td mv-td--center">
+                        @if (moveType(m.name)) {
+                        <span class="mv-badge mv-badge--type" [ngStyle]="{
+                background: TYPE_COLORS[moveType(m.name)] + '28',
+                'border-color': TYPE_COLORS[moveType(m.name)] + '55',
+                color: TYPE_COLORS[moveType(m.name)]
+              }">{{ moveType(m.name) }}</span>
+                        } @else {
+                        <span class="mv-loading-dot"></span>
+                        }
+                    </td>
+                    <td class="mv-td mv-td--center">
+                        @if (moveDamageClass(m.name)) {
+                        <span class="mv-badge mv-badge--class" [ngStyle]="{
+                background: DAMAGE_CLASS_COLORS[moveDamageClass(m.name)] + '20',
+                'border-color': DAMAGE_CLASS_COLORS[moveDamageClass(m.name)] + '50',
+                color: DAMAGE_CLASS_COLORS[moveDamageClass(m.name)]
+              }">{{ moveDamageClass(m.name) }}</span>
+                        }
+                    </td>
+                    <td class="mv-td mv-td--center mv-td--num">{{ movePower(m.name) ?? '—' }}</td>
+                    <td class="mv-td mv-td--center mv-td--num">
+                        @if (moveAccuracy(m.name) !== null) { {{ moveAccuracy(m.name) }}% } @else { — }
+                    </td>
+                    <td class="mv-td mv-td--center mv-td--num">{{ movePP(m.name) ?? '—' }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+        @if (pageLoading() && allMoves().length === 0) {
+        <div class="mv-spinner-wrap">
+            <div class="spinner"></div>
+        </div>
+        }
+    </div>
+
+    <!-- Load more -->
+    @if (hasMore()) {
+    <div class="mv-load-more-wrap">
+        <button class="mv-load-more-btn" (click)="loadMore()" [disabled]="pageLoading()" i18n>
+            @if (pageLoading()) { Loading… } @else { Load more moves }
+        </button>
+    </div>
+    }
+
+    <!-- ── Move detail panel (slide-in) ── -->
+    @if (selectedMove()) {
+    <div class="mv-overlay" (click)="closeDetail()" i18n-aria-label aria-label="Close detail"></div>
+    <aside class="mv-detail" role="complementary">
+        <div class="mv-detail-header">
+            <h2 class="mv-detail-name">{{ selectedMove()!.name | titlecase }}</h2>
+            <button class="mv-detail-close" (click)="closeDetail()" i18n-aria-label aria-label="Close">✕</button>
+        </div>
+
+        <div class="mv-detail-badges">
+            @if (selectedMove()!.type) {
+            <span class="mv-badge mv-badge--type mv-badge--lg" [ngStyle]="{
+          background: TYPE_COLORS[selectedMove()!.type.name] + '28',
+          'border-color': TYPE_COLORS[selectedMove()!.type.name] + '55',
+          color: TYPE_COLORS[selectedMove()!.type.name]
+        }">{{ selectedMove()!.type.name }}</span>
+            }
+            @if (selectedMove()!.damage_class) {
+            <span class="mv-badge mv-badge--class mv-badge--lg" [ngStyle]="{
+          background: DAMAGE_CLASS_COLORS[selectedMove()!.damage_class.name] + '20',
+          'border-color': DAMAGE_CLASS_COLORS[selectedMove()!.damage_class.name] + '50',
+          color: DAMAGE_CLASS_COLORS[selectedMove()!.damage_class.name]
+        }">{{ selectedMove()!.damage_class.name }}</span>
+            }
+        </div>
+
+        <div class="mv-detail-stats">
+            <div class="mv-detail-stat">
+                <span class="mv-detail-stat-label" i18n>Power</span>
+                <span class="mv-detail-stat-val">{{ selectedMove()!.power ?? '—' }}</span>
+            </div>
+            <div class="mv-detail-stat">
+                <span class="mv-detail-stat-label" i18n>Accuracy</span>
+                <span class="mv-detail-stat-val">
+                    @if (selectedMove()!.accuracy !== null) { {{ selectedMove()!.accuracy }}% } @else { — }
+                </span>
+            </div>
+            <div class="mv-detail-stat">
+                <span class="mv-detail-stat-label" i18n>PP</span>
+                <span class="mv-detail-stat-val">{{ selectedMove()!.pp ?? '—' }}</span>
+            </div>
+        </div>
+
+        <div class="mv-detail-effect">
+            <h3 class="mv-detail-effect-title" i18n>Effect</h3>
+            <p class="mv-detail-effect-text">{{ moveEffect(selectedMove()!) }}</p>
+        </div>
+    </aside>
+    }
+
+</div>

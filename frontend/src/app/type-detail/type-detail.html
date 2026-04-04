@@ -1,0 +1,142 @@
+<div class="td-page">
+
+    <!-- ── Header ── -->
+    <header class="td-header" [style.--type-color]="typeColor()">
+        <a class="td-back" routerLink="/type-chart" i18n-aria-label aria-label="Back to Type Chart">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+            </svg>
+            <span i18n>Type Chart</span>
+        </a>
+
+        @if (!loading() && !error()) {
+        <div class="td-hero">
+            <span class="td-type-badge" [ngStyle]="{
+        background: TYPE_COLORS[typeName()] + '28',
+        'border-color': TYPE_COLORS[typeName()] + '55',
+        color: TYPE_COLORS[typeName()]
+      }">{{ typeName() | titlecase }}</span>
+            <h1 class="td-title">{{ typeName() | titlecase }} <span i18n>Type</span></h1>
+            <div class="td-meta-row">
+                <span class="td-meta-chip" i18n>{{ pokemonCount() }} Pokémon</span>
+                <span class="td-meta-chip" i18n>{{ movesCount() }} Moves</span>
+            </div>
+        </div>
+        }
+
+        @if (loading()) {
+        <div class="td-hero-loading">
+            <div class="spinner"></div>
+        </div>
+        }
+    </header>
+
+    @if (error()) {
+    <div class="td-error" i18n>Could not load type data. Check your connection.</div>
+    }
+
+    @if (!loading() && !error()) {
+
+    <!-- ── Matchup cards ── -->
+    <section class="td-section td-matchups">
+
+        <!-- Defensive matchups -->
+        <div class="td-matchup-group">
+            <h2 class="td-section-title" i18n>Weak to</h2>
+            <div class="td-chip-row">
+                @for (e of weaknesses(); track e.type) {
+                <a class="td-type-chip" [routerLink]="['/type', e.type]"
+                    [ngStyle]="{ background: TYPE_COLORS[e.type] + '20', 'border-color': TYPE_COLORS[e.type] + '55', color: TYPE_COLORS[e.type] }">
+                    {{ e.type | titlecase }}<span class="td-mult">{{ multLabel(e.multiplier) }}</span>
+                </a>
+                }
+                @if (!weaknesses().length) { <span class="td-none" i18n>None</span> }
+            </div>
+
+            <h2 class="td-section-title" i18n>Resistant to</h2>
+            <div class="td-chip-row">
+                @for (e of resistances(); track e.type) {
+                <a class="td-type-chip" [routerLink]="['/type', e.type]"
+                    [ngStyle]="{ background: TYPE_COLORS[e.type] + '20', 'border-color': TYPE_COLORS[e.type] + '55', color: TYPE_COLORS[e.type] }">
+                    {{ e.type | titlecase }}<span class="td-mult">{{ multLabel(e.multiplier) }}</span>
+                </a>
+                }
+                @if (!resistances().length) { <span class="td-none" i18n>None</span> }
+            </div>
+
+            <h2 class="td-section-title" i18n>Immune to</h2>
+            <div class="td-chip-row">
+                @for (e of immunities(); track e.type) {
+                <a class="td-type-chip" [routerLink]="['/type', e.type]"
+                    [ngStyle]="{ background: TYPE_COLORS[e.type] + '20', 'border-color': TYPE_COLORS[e.type] + '55', color: TYPE_COLORS[e.type] }">
+                    {{ e.type | titlecase }}
+                </a>
+                }
+                @if (!immunities().length) { <span class="td-none" i18n>None</span> }
+            </div>
+        </div>
+
+        <!-- Offensive matchups -->
+        <div class="td-matchup-group">
+            <h2 class="td-section-title" i18n>Super effective against</h2>
+            <div class="td-chip-row">
+                @for (e of offStrong(); track e.type) {
+                <a class="td-type-chip" [routerLink]="['/type', e.type]"
+                    [ngStyle]="{ background: TYPE_COLORS[e.type] + '20', 'border-color': TYPE_COLORS[e.type] + '55', color: TYPE_COLORS[e.type] }">
+                    {{ e.type | titlecase }}<span class="td-mult">{{ multLabel(e.multiplier) }}</span>
+                </a>
+                }
+                @if (!offStrong().length) { <span class="td-none" i18n>None</span> }
+            </div>
+
+            <h2 class="td-section-title" i18n>Not very effective against</h2>
+            <div class="td-chip-row">
+                @for (e of offWeak(); track e.type) {
+                <a class="td-type-chip" [routerLink]="['/type', e.type]"
+                    [ngStyle]="{ background: TYPE_COLORS[e.type] + '20', 'border-color': TYPE_COLORS[e.type] + '55', color: TYPE_COLORS[e.type] }">
+                    {{ e.type | titlecase }}<span class="td-mult">{{ multLabel(e.multiplier) }}</span>
+                </a>
+                }
+                @if (!offWeak().length) { <span class="td-none" i18n>None</span> }
+            </div>
+
+            <h2 class="td-section-title" i18n>No effect against</h2>
+            <div class="td-chip-row">
+                @for (e of offImmune(); track e.type) {
+                <a class="td-type-chip" [routerLink]="['/type', e.type]"
+                    [ngStyle]="{ background: TYPE_COLORS[e.type] + '20', 'border-color': TYPE_COLORS[e.type] + '55', color: TYPE_COLORS[e.type] }">
+                    {{ e.type | titlecase }}
+                </a>
+                }
+                @if (!offImmune().length) { <span class="td-none" i18n>None</span> }
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ── All Pokémon of this type ── -->
+    <section class="td-section">
+        <h2 class="td-section-heading" i18n>{{ typeName() | titlecase }}-Type Pokémon</h2>
+        <p class="td-section-sub" i18n>Primary type only · sorted by Pokédex number</p>
+
+        <div class="td-pokemon-grid">
+            @for (p of displayedPokemon(); track p.id) {
+            <a class="td-pokemon-card" [routerLink]="['/pokemon', p.id]">
+                <img class="td-pokemon-sprite" [src]="p.sprite" [alt]="p.name" loading="lazy" />
+                <div class="td-pokemon-id">#{{ p.id.toString().padStart(3, '0') }}</div>
+                <div class="td-pokemon-name">{{ p.name | titlecase }}</div>
+            </a>
+            }
+        </div>
+
+        @if (hasMore()) {
+        <div class="td-load-more-wrap">
+            <button class="td-load-more-btn" (click)="loadMore()" i18n>Show more</button>
+        </div>
+        }
+    </section>
+
+    }
+
+</div>

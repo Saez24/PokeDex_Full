@@ -1,0 +1,131 @@
+<div class="tb-page">
+
+    <!-- ── Header ── -->
+    <header class="tb-header">
+        <a class="tb-back" routerLink="/" i18n-aria-label aria-label="Back to Pokédex">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+            </svg>
+            <span i18n>Pokédex</span>
+        </a>
+        <div class="tb-header-row">
+            <h1 class="tb-title" i18n>Team Builder</h1>
+            @if (teamPokemon().length > 0) {
+            <button class="tb-clear-btn" (click)="clearTeam()" i18n>Clear</button>
+            }
+        </div>
+        <p class="tb-subtitle" i18n>Build a team of up to 6 Pokémon. Enter a name or ID in each slot.</p>
+    </header>
+
+    <!-- ── Team slots ── -->
+    <div class="tb-slots">
+        @for (slot of slots(); track $index; let i = $index) {
+        <div class="tb-slot" [class.tb-slot--filled]="slot.pokemon !== null"
+            [style.--type-color]="slot.pokemon ? primaryTypeColor(slot.pokemon) : '#aaa'">
+
+            @if (slot.pokemon; as p) {
+            <!-- Filled slot -->
+            <div class="tb-slot-art">
+                <img class="tb-sprite" [src]="spriteUrl(p)" [alt]="p.name" loading="lazy" />
+            </div>
+            <div class="tb-slot-info">
+                <div class="tb-slot-name">{{ p.name }}</div>
+                <div class="tb-slot-id">#{{ p.id.toString().padStart(3, '0') }}</div>
+                <div class="tb-slot-types">
+                    @for (t of p.types; track t.slot) {
+                    <span class="tb-type-badge" [ngStyle]="{
+              background: TYPE_COLORS[t.type.name] + '28',
+              'border-color': TYPE_COLORS[t.type.name] + '55',
+              color: TYPE_COLORS[t.type.name]
+            }">{{ t.type.name }}</span>
+                    }
+                </div>
+            </div>
+            <button class="tb-remove-btn" (click)="removePokemon(i)" i18n-aria-label
+                aria-label="Remove Pokémon">✕</button>
+
+            } @else if (slot.loading) {
+            <!-- Loading -->
+            <div class="tb-slot-loading">
+                <div class="spinner"></div>
+            </div>
+
+            } @else {
+            <!-- Empty slot -->
+            <div class="tb-slot-empty">
+                <div class="tb-slot-num">{{ i + 1 }}</div>
+                <input class="tb-input" type="text" [value]="searchInputs()[i]"
+                    (input)="updateInput(i, $any($event.target).value)" (keydown)="onInputKeydown($event, i)"
+                    placeholder="Name or ID…" i18n-placeholder aria-label="Enter Pokémon name or ID" i18n-aria-label />
+                @if (searchErrors()[i]) {
+                <div class="tb-error">{{ searchErrors()[i] }}</div>
+                }
+                <button class="tb-add-btn" (click)="addPokemon(i, searchInputs()[i])"
+                    [disabled]="!searchInputs()[i].trim()" i18n>Add</button>
+            </div>
+            }
+        </div>
+        }
+    </div>
+
+    <!-- ── Analysis ── -->
+    @if (teamPokemon().length > 0) {
+    <section class="tb-analysis">
+        <div class="tb-analysis-grid">
+
+            <!-- Weaknesses -->
+            <div class="tb-analysis-card">
+                <h2 class="tb-analysis-title" i18n>Team Weaknesses</h2>
+                <p class="tb-analysis-desc" i18n>Average damage taken from each attacking type</p>
+                <div class="tb-coverage-list">
+                    @for (entry of teamWeaknesses(); track entry.type) {
+                    <div class="tb-coverage-row" [ngStyle]="{ background: multiplierColor(entry.value) }">
+                        <span class="tb-coverage-type" [ngStyle]="{ color: TYPE_COLORS[entry.type] }">
+                            {{ entry.type }}
+                        </span>
+                        <span class="tb-coverage-val" [ngStyle]="{ color: multiplierTextColor(entry.value) }">
+                            {{ multiplierLabel(entry.value) }}
+                        </span>
+                    </div>
+                    }
+                    @if (!teamWeaknesses().length) {
+                    <div class="tb-empty-analysis" i18n>No common weaknesses — great team!</div>
+                    }
+                </div>
+            </div>
+
+            <!-- Coverage gaps -->
+            <div class="tb-analysis-card">
+                <h2 class="tb-analysis-title" i18n>Coverage Gaps</h2>
+                <p class="tb-analysis-desc" i18n>Types your team cannot hit super-effectively</p>
+                <div class="tb-coverage-list">
+                    @for (entry of coverageGaps(); track entry.type) {
+                    <div class="tb-coverage-row" [ngStyle]="{ background: multiplierColor(entry.value) }">
+                        <span class="tb-coverage-type" [ngStyle]="{ color: TYPE_COLORS[entry.type] }">
+                            {{ entry.type }}
+                        </span>
+                        <span class="tb-coverage-val" [ngStyle]="{ color: multiplierTextColor(entry.value) }">
+                            {{ multiplierLabel(entry.value) }}
+                        </span>
+                    </div>
+                    }
+                    @if (!coverageGaps().length) {
+                    <div class="tb-empty-analysis" i18n>Full type coverage — excellent!</div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Export URL -->
+        @if (teamUrl()) {
+        <div class="tb-export">
+            <span class="tb-export-label" i18n>Share team:</span>
+            <code class="tb-export-url">{{ teamUrl() }}</code>
+            <button class="tb-copy-btn" (click)="copyUrl()" i18n>Copy</button>
+        </div>
+        }
+    </section>
+    }
+
+</div>

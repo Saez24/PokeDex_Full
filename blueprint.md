@@ -69,30 +69,22 @@ App (root, RouterOutlet)
 
 ## Offene Features (Backlog)
 
-### Phase 2 – Ergänzungen ✅
-
-| Feature                                         | Datei(en)                                                             | Status    |
-| ----------------------------------------------- | --------------------------------------------------------------------- | --------- |
-| URL-Routing `/pokemon/:id` (Lazy-Load)          | `app.routes.ts`, `pokemon-detail/pokemon-detail.ts/.html/.scss`       | ✅ Fertig |
-| TM/HM + Ei-Attacken-Tabs im Dialog              | `pokemon-dialog.ts/.html/.scss` (Segmented control, lazy load)        | ✅ Fertig |
-| Pokémon-Formen (Alola, Galar, Mega …) im Dialog | `pokemon-dialog.ts/.html/.scss` (Form-Chips, `dp()` computed Signal)  | ✅ Fertig |
-| „Open as Page"-Button im Dialog                 | `pokemon-dialog.ts/.html`                                             | ✅ Fertig |
-| Vollständige Detail-Seite `/pokemon/:id`        | `pokemon-detail/` (Stats, Evolution, Moves mit Tabs, Shiny, Cry, Fav) | ✅ Fertig |
+### Phase 2 – Ergänzungen ✅\n\n| Feature | Datei(en) | Status |\n| ----------------------------------------------- | --------------------------------------------------------------------- | --------- |\n| URL-Routing `/pokemon/:id` (Lazy-Load) | `app.routes.ts`, `pokemon-detail/pokemon-detail.ts/.html/.scss` | ✅ Fertig |\n| TM/HM + Ei-Attacken-Tabs im Dialog | `pokemon-dialog.ts/.html/.scss` (Segmented control, lazy load) | ✅ Fertig |\n| Pokémon-Formen (Alola, Galar, Mega …) im Dialog | `pokemon-dialog.ts/.html/.scss` (Form-Chips, `dp()` computed Signal) | ✅ Fertig |\n| „Open as Page"-Button im Dialog | `pokemon-dialog.ts/.html` | ✅ Fertig |\n| Vollständige Detail-Seite `/pokemon/:id` | `pokemon-detail/` (Stats, Evolution, Moves mit Tabs, Shiny, Cry, Fav) | ✅ Fertig |\n| Dark/Light-Mode Dialog + Detail-Page | `styles.scss` (CSS-Vars `--d-*`, globale Komponenten-Overrides) | ✅ Fertig |
 
 ### Phase 3 – Erweiterte Features
 
-- [ ] **Vergleichsmodus** — Route `/compare`, 2–4 Pokémon nebeneinander, Radar-Chart
-- [ ] **Team Builder** — Route `/team`, 6 Slots, Typ-Abdeckungs-Analyse, URL-Export
-- [ ] **Typ-Effektivitäts-Chart** — Route `/type-chart`, 18×18-Schadensmatrix, interaktiv
-- [ ] **Move-Enzyklopädie** — Route `/moves`, tabellarische Liste aller Moves mit Filter
-- [ ] **Typ-Detailseiten** — Route `/type/:name`, alle Pokémon des Typs
+- [x] **Typ-Effektivitäts-Chart** — Route `/type-chart`, 18×18-Schadensmatrix, interaktiv, Angreifer/Verteidiger-Auswahl, Highlights (`type-chart/type-chart.ts/.html/.scss`)
+- [x] **Team Builder** — Route `/team`, 6 Slots, Typ-Abdeckungs-Analyse, URL-Export (`team-builder/team-builder.ts/.html/.scss`)
+- [x] **Vergleichsmodus** — Route `/compare`, bis zu 4 Pokémon, Stat-Bars, Vergleichstabelle mit Winner-Highlight (`compare/compare.ts/.html/.scss`)
+- [x] **Move-Enzyklopädie** — Route `/moves`, paginierte Tabelle aller Moves, Filter nach Typ/Klasse/Name, Detail-Slide-In-Panel (`moves/moves.ts/.html/.scss`)
+- [x] **Typ-Detailseiten** — Route `/type/:name`, Matchup-Karten (defensiv + offensiv), alle primären Pokémon paginiert, verlinkbar vom Type-Chart (`type-detail/type-detail.ts/.html/.scss`)
 
 ### Phase 4 – Finish & PWA
 
-- [ ] **PWA** — `@angular/pwa`, Service Worker, Offline-Betrieb
-- [ ] **Virtual Scroll** — `CdkVirtualScrollViewport` statt Load-More (für 1000+ Pokémon)
-- [ ] **SEO / SSR** — `@angular/ssr`, `Meta`-Service für og:title, og:image
-- [ ] **i18n vollständig** — `ng extract-i18n` → `.xlf`-Bundles generieren, alle Strings extrahiert
+- [x] **PWA** — `@angular/service-worker` installiert, `ngsw-config.json` (App-Shell + API-Cache 7d + Sprite-Cache 30d), `manifest.webmanifest`, `provideServiceWorker` in `app.config.ts`, Meta-Tags in `index.html`
+- [x] **Virtual Scroll** — `CdkVirtualScrollViewport` (row-basiert, 4 Spalten responsive 2/3/4, `ITEM_SIZE=270px`, `pokemonRows` computed signal, Auto-Load via `scrolledIndexChange`, `trackRow` TrackBy)
+- [x] **SEO / Meta-Service** — `SeoService` (`Title` + `Meta` aus `@angular/platform-browser`), injiziert in alle 7 Page-Komponenten (Content, PokemonDetail, Compare, TeamBuilder, Moves, TypeChart, TypeDetail), OG-Tags + Twitter-Card für Pokémon-Detailseiten
+- [x] **i18n** — `ng extract-i18n` (182 Units → `src/i18n/messages.xlf`), `messages.de.xlf` mit 125 deutschen Übersetzungen, `angular.json` i18n-Konfiguration (`sourceLocale: en-US`, `locales.de`), `ng build --localize` erfolgreich
 
 ---
 

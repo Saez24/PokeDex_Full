@@ -1,27 +1,66 @@
 <nav class="nav">
-  <div class="nav-logo">Poké<span>dex</span></div>
+  <a class="nav-logo" routerLink="/">Poké<span>dex</span></a>
+
+  <!-- Tool nav links -->
+  <div class="nav-links">
+    <a class="nav-link" routerLink="/type-chart" routerLinkActive="nav-link--active" i18n-aria-label
+      aria-label="Type Chart">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" />
+        <rect x="14" y="3" width="7" height="7" />
+        <rect x="14" y="14" width="7" height="7" />
+        <rect x="3" y="14" width="7" height="7" />
+      </svg>
+      <span i18n>Type Chart</span>
+    </a>
+    <a class="nav-link" routerLink="/team" routerLinkActive="nav-link--active" i18n-aria-label
+      aria-label="Team Builder">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="9" cy="7" r="4" />
+        <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        <path d="M21 21v-2a4 4 0 0 0-3-3.87" />
+      </svg>
+      <span i18n>Team</span>
+    </a>
+    <a class="nav-link" routerLink="/compare" routerLinkActive="nav-link--active" i18n-aria-label
+      aria-label="Compare Pokémon">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10" />
+        <line x1="12" y1="20" x2="12" y2="4" />
+        <line x1="6" y1="20" x2="6" y2="14" />
+      </svg>
+      <span i18n>Compare</span>
+    </a>
+    <a class="nav-link" routerLink="/moves" routerLinkActive="nav-link--active" i18n-aria-label
+      aria-label="Move Encyclopedia">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
+        <line x1="10" y1="9" x2="8" y2="9" />
+      </svg>
+      <span i18n>Moves</span>
+    </a>
+  </div>
+
   <div class="nav-count">
     <!-- <strong>{{ pokemonService.total() }}</strong> Einträge geladen -->
   </div>
 
-  <select
-    id="language-select"
-    class="language-select"
-    [value]="currentLang"
-    (change)="setLanguage($event)"
-  >
+  <select id="language-select" class="language-select" [value]="currentLang" (change)="setLanguage($event)">
     @for (lang of languages; track lang.code) {
-      <option [value]="lang.code">{{ lang.label }}</option>
+    <option [value]="lang.code">{{ lang.label }}</option>
     }
   </select>
 
-  <button
-    mat-icon-button
-    disableRipple
-    (click)="toggleTheme()"
-    [attr.aria-label]="isDarkMode() ? 'Switch to light mode' : 'Switch to dark mode'"
-    class="mobile-theme-toggle"
-  >
+  <button mat-icon-button disableRipple (click)="toggleTheme()"
+    [attr.aria-label]="isDarkMode() ? 'Switch to light mode' : 'Switch to dark mode'" class="mobile-theme-toggle">
     <mat-icon>{{ isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
   </button>
 </nav>

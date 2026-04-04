@@ -23,6 +23,7 @@ import { EvolutionStep } from '../shared/models/evolution.model';
 import { MoveRow } from '../shared/models/move.model';
 import { PokemonService } from '../shared/services/pokemon/pokemon';
 import { FavoritesService } from '../shared/services/favorites/favorites';
+import { SeoService } from '../shared/services/seo/seo';
 
 @Component({
     selector: 'app-pokemon-detail',
@@ -37,6 +38,7 @@ export class PokemonDetail implements OnInit {
     private readonly api = inject(Api);
     readonly pokemonService = inject(PokemonService);
     readonly favoritesService = inject(FavoritesService);
+    private readonly seoService = inject(SeoService);
 
     readonly STAT_LABELS = STAT_LABELS;
     readonly TYPE_COLORS = TYPE_COLORS;
@@ -182,7 +184,14 @@ export class PokemonDetail implements OnInit {
                 this.loadSpecies(id);
                 this.loadAbilityDescriptions(p);
                 this.loading.set(false);
+                const name = p.name.charAt(0).toUpperCase() + p.name.slice(1);
+                this.seoService.setPage({
+                    title: `${name} #${String(p.id).padStart(3, '0')}`,
+                    description: `${name} – Typen, Stats, Moves und mehr im PokéDex.`,
+                    image: (p.sprites.other as any)['official-artwork']?.front_default,
+                });
             },
+
             error: () => { this.error.set(true); this.loading.set(false); },
         });
     }

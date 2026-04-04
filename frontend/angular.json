@@ -17,6 +17,14 @@
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
+      "i18n": {
+        "sourceLocale": "en-US",
+        "locales": {
+          "de": {
+            "translation": "src/i18n/messages.de.xlf"
+          }
+        }
+      },
       "architect": {
         "build": {
           "builder": "@angular/build:application",
@@ -35,6 +43,7 @@
           },
           "configurations": {
             "production": {
+              "serviceWorker": "ngsw-config.json",
               "budgets": [
                 {
                   "type": "initial",
