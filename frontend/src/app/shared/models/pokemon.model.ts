@@ -61,6 +61,8 @@ export interface PokemonSpecies {
     language: { name: string };
     version: { name: string };
   }[];
+  varieties: { is_default: boolean; pokemon: { name: string; url: string } }[];
+  genera: { genus: string; language: { name: string } }[];
 }
 
 export interface Pokemon {

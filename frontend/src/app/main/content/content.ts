@@ -6,6 +6,7 @@ import {
   ElementRef,
   inject,
   OnInit,
+  signal,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,7 +19,8 @@ import {
   TYPE_COLORS,
 } from '../../shared/utils/pokemon-types.util';
 import { PokemonDialog } from '../pokemon-dialog/pokemon-dialog';
-import { PokemonService } from '../../shared/services/pokemon/pokemon';
+import { PokemonService, GENERATIONS } from '../../shared/services/pokemon/pokemon';
+import { FavoritesService } from '../../shared/services/favorites/favorites';
 import { Pokemon } from '../../shared/models/pokemon.model';
 
 @Component({
@@ -32,8 +34,11 @@ export class Content implements OnInit, AfterViewInit {
   private dialog = inject(MatDialog);
   private observer!: IntersectionObserver;
   readonly pokemonService = inject(PokemonService);
+  readonly favoritesService = inject(FavoritesService);
   readonly TYPE_COLORS = TYPE_COLORS;
   readonly STAT_LABELS = STAT_LABELS;
+  readonly GENERATIONS = GENERATIONS;
+  readonly ALL_TYPES = Object.keys(TYPE_COLORS);
 
   constructor(private el: ElementRef) {
     this.initObserver();
@@ -92,7 +97,6 @@ export class Content implements OnInit, AfterViewInit {
       width: '100%',
       backdropClass: 'poke-dialog-backdrop',
     });
-    console.log(pokemon);
   }
 
   loadMore() {
@@ -101,6 +105,24 @@ export class Content implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.observeNewCards();
     }, 50);
+  }
+
+  onSearch(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.pokemonService.searchQuery.set(value);
+  }
+
+  onTypeFilter(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    this.pokemonService.selectedType.set(value);
+  }
+
+  onGenFilter(index: number): void {
+    this.pokemonService.setGeneration(index);
+  }
+
+  toggleFavorites(): void {
+    this.pokemonService.showFavorites.update((v) => !v);
   }
 
   primaryColor(p: Pokemon): string {

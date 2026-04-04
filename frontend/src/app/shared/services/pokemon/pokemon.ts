@@ -5,23 +5,78 @@ import { Api } from '../api/api';
 import { ApiListResponse } from '../../models/api-list-response.model';
 import { NamedResource } from '../../models/named-resource.model';
 import { HttpClient } from '@angular/common/http';
+import { FavoritesService } from '../favorites/favorites';
+
+export const GENERATIONS: { label: string; offset: number; limit: number }[] = [
+  { label: 'All', offset: 0, limit: 20 },
+  { label: 'Gen I', offset: 0, limit: 151 },
+  { label: 'Gen II', offset: 151, limit: 100 },
+  { label: 'Gen III', offset: 251, limit: 135 },
+  { label: 'Gen IV', offset: 386, limit: 107 },
+  { label: 'Gen V', offset: 493, limit: 156 },
+  { label: 'Gen VI', offset: 649, limit: 72 },
+  { label: 'Gen VII', offset: 721, limit: 88 },
+  { label: 'Gen VIII', offset: 809, limit: 96 },
+  { label: 'Gen IX', offset: 905, limit: 120 },
+];
 
 @Injectable({ providedIn: 'root' })
 export class PokemonService {
   private api = inject(Api);
+  private favoritesService = inject(FavoritesService);
   private readonly PAGE_SIZE = 20;
   http = inject(HttpClient);
+
+  /* ── Raw data ── */
   pokemon = signal<Pokemon[]>([]);
   loading = signal(false);
   offset = signal(0);
   hasMore = signal(true);
   total = computed(() => this.pokemon().length);
+
+  /* ── Filter signals ── */
+  searchQuery = signal('');
+  selectedType = signal('');
+  selectedGenIndex = signal(0);
+  showFavorites = signal(false);
+
+  /* ── Filtered view ── */
+  filteredPokemon = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    const type = this.selectedType();
+    const favOnly = this.showFavorites();
+    const favSet = this.favoritesService.favorites();
+
+    return this.pokemon().filter((p) => {
+      if (favOnly && !favSet.has(p.id)) return false;
+      if (type && !p.types.some((t) => t.type.name === type)) return false;
+      if (query) {
+        const matchName = p.name.toLowerCase().includes(query);
+        const matchId = String(p.id).includes(query);
+        const matchLocalizedName = this.getLocalizedName(p.species)?.toLowerCase().includes(query);
+        if (!matchName && !matchId && !matchLocalizedName) return false;
+      }
+      return true;
+    });
+  });
+
   private _language = signal('en');
   public language = computed(() => this._language());
   private typeCache = new Map<string, any>();
+  private _genIndex = 0;
 
   setLanguage(lang: string) {
     this._language.set(lang);
+  }
+
+  setGeneration(index: number): void {
+    if (index === this._genIndex) return;
+    this._genIndex = index;
+    this.selectedGenIndex.set(index);
+    this.pokemon.set([]);
+    this.offset.set(0);
+    this.hasMore.set(true);
+    this.loadMore();
   }
 
   constructor() {
@@ -141,55 +196,90 @@ export class PokemonService {
     if (this.loading() || !this.hasMore()) return;
     this.loading.set(true);
 
+    const gen = GENERATIONS[this._genIndex];
+    const genOffset = gen.offset;
+    const maxForGen = gen.limit;
+    const currentOffset = this.offset();
+
+    // In "All"-Mode (index 0) laden wir unbegrenzt
+    // In Gen-Modus laden wir nur bis zum Limit
+    const remaining = this._genIndex === 0 ? this.PAGE_SIZE : maxForGen - currentOffset;
+    if (remaining <= 0) {
+      this.hasMore.set(false);
+      this.loading.set(false);
+      return;
+    }
+    const pageSize = Math.min(this.PAGE_SIZE, remaining);
+    const fetchOffset = this._genIndex === 0 ? currentOffset : genOffset + currentOffset;
+
     this.api
-      .getResource<
-        ApiListResponse<NamedResource>
-      >('pokemon', `limit=${this.PAGE_SIZE}&offset=${this.offset()}`)
-      .subscribe((response) => {
-        if (!response.next) this.hasMore.set(false);
-
-        forkJoin(
-          response.results.map((p) =>
-            forkJoin({
-              base: this.api.getResource<Pokemon>('pokemon', undefined, p.name),
-              species: this.api.getResource<any>('pokemon-species', undefined, p.name),
-            }),
-          ),
-        ).subscribe((results) => {
-          const uniqueTypeNames = [
-            ...new Set(results.flatMap((r) => r.base.types.map((t: any) => t.type.name))),
-          ];
-          const uniqueAbilityNames = [
-            ...new Set(results.flatMap((r) => r.base.abilities.map((a: any) => a.ability.name))),
-          ];
-
-          const uncachedTypes = uniqueTypeNames.filter((n) => !this.typeCache.has(n));
-          const uncachedAbilities = uniqueAbilityNames.filter((n) => !this.typeCache.has(n));
-          const allUncached = [...uncachedTypes, ...uncachedAbilities];
-
-          const finalize = () => {
-            const enriched = results.map((r) => ({ ...r.base, species: r.species }));
-            this.pokemon.update((prev) => [...prev, ...enriched]);
-            this.offset.update((v) => v + this.PAGE_SIZE);
-            this.loading.set(false);
-          };
-
-          if (allUncached.length === 0) {
-            finalize();
-            return;
+      .getResource<ApiListResponse<NamedResource>>(
+        'pokemon',
+        `limit=${pageSize}&offset=${fetchOffset}`,
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response.next || (this._genIndex !== 0 && currentOffset + pageSize >= maxForGen)) {
+            this.hasMore.set(false);
           }
 
-          forkJoin([
-            ...uncachedTypes.map((n) => this.api.getResource<any>('type', undefined, n)),
-            ...uncachedAbilities.map((n) => this.api.getResource<any>('ability', undefined, n)),
-          ]).subscribe((details) => {
-            uncachedTypes.forEach((name, i) => this.typeCache.set(name, details[i]));
-            uncachedAbilities.forEach((name, i) =>
-              this.typeCache.set(name, details[uncachedTypes.length + i]),
-            );
-            finalize();
+          forkJoin(
+            response.results.map((p) =>
+              forkJoin({
+                base: this.api.getResource<Pokemon>('pokemon', undefined, p.name),
+                species: this.api.getResource<any>('pokemon-species', undefined, p.name),
+              }),
+            ),
+          ).subscribe({
+            next: (results) => {
+              const uniqueTypeNames = [
+                ...new Set(results.flatMap((r) => r.base.types.map((t: any) => t.type.name))),
+              ];
+              const uniqueAbilityNames = [
+                ...new Set(
+                  results.flatMap((r) => r.base.abilities.map((a: any) => a.ability.name)),
+                ),
+              ];
+
+              const uncachedTypes = uniqueTypeNames.filter((n) => !this.typeCache.has(n));
+              const uncachedAbilities = uniqueAbilityNames.filter((n) => !this.typeCache.has(n));
+              const allUncached = [...uncachedTypes, ...uncachedAbilities];
+
+              const finalize = () => {
+                const enriched = results.map((r) => ({ ...r.base, species: r.species }));
+                this.pokemon.update((prev) => [...prev, ...enriched]);
+                this.offset.update((v) => v + pageSize);
+                this.loading.set(false);
+              };
+
+              if (allUncached.length === 0) {
+                finalize();
+                return;
+              }
+
+              forkJoin([
+                ...uncachedTypes.map((n) => this.api.getResource<any>('type', undefined, n)),
+                ...uncachedAbilities.map((n) =>
+                  this.api.getResource<any>('ability', undefined, n),
+                ),
+              ]).subscribe({
+                next: (details) => {
+                  uncachedTypes.forEach((name, i) => this.typeCache.set(name, details[i]));
+                  uncachedAbilities.forEach((name, i) =>
+                    this.typeCache.set(name, details[uncachedTypes.length + i]),
+                  );
+                  finalize();
+                },
+                error: () => {
+                  // Cache miss – trotzdem anzeigen
+                  finalize();
+                },
+              });
+            },
+            error: () => this.loading.set(false),
           });
-        });
+        },
+        error: () => this.loading.set(false),
       });
   }
 }

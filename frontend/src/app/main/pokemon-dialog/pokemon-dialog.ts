@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
-import { NgStyle } from '@angular/common';
+import { NgStyle, DecimalPipe } from '@angular/common';
+import { Router } from '@angular/router';
 import { forkJoin, map, switchMap } from 'rxjs';
 
 import {
@@ -15,10 +16,11 @@ import { Api } from '../../shared/services/api/api';
 import { EvolutionStep } from '../../shared/models/evolution.model';
 import { MoveRow } from '../../shared/models/move.model';
 import { PokemonService } from '../../shared/services/pokemon/pokemon';
+import { FavoritesService } from '../../shared/services/favorites/favorites';
 
 @Component({
   selector: 'app-pokemon-dialog',
-  imports: [MatDialogModule, MatTabsModule, NgStyle],
+  imports: [MatDialogModule, MatTabsModule, NgStyle, DecimalPipe],
   templateUrl: './pokemon-dialog.html',
   styleUrl: './pokemon-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,38 +30,104 @@ export class PokemonDialog implements OnInit {
   readonly pokemon: Pokemon = inject(MAT_DIALOG_DATA);
   private readonly api = inject(Api);
   readonly pokemonService = inject(PokemonService);
+  readonly favoritesService = inject(FavoritesService);
 
   readonly STAT_LABELS = STAT_LABELS;
   readonly TYPE_COLORS = TYPE_COLORS;
 
+  private readonly router = inject(Router);
+
   /* ── Signals ── */
   evolutionChain = signal<EvolutionStep[]>([]);
-  moves          = signal<MoveRow[]>([]);
-  movesLoading   = signal(false);
+  moves = signal<MoveRow[]>([]);
+  movesLoading = signal(false);
   evolutionLoading = signal(false);
-  species        = signal<any | null>(null);
-  selectedMove   = signal<MoveRow | null>(null);  // aufgeklappter Move
+  species = signal<any | null>(null);
+  selectedMove = signal<MoveRow | null>(null);
+  isShiny = signal(false);
+  isCryPlaying = signal(false);
+  abilityDetails = signal<Record<string, string>>({});
+
+  /* ── Forms ── */
+  formPokemon = signal<Pokemon | null>(null);
+  formLoading = signal(false);
+  currentFormName = signal('');
+
+  /* ── Move tabs ── */
+  moveTab = signal<'level-up' | 'machine' | 'egg'>('level-up');
+  tmMoves = signal<MoveRow[]>([]);
+  eggMoves = signal<MoveRow[]>([]);
+  tmMovesLoading = signal(false);
+  eggMovesLoading = signal(false);
+
+  /* ── Display pokemon (form-aware) ── */
+  readonly dp = computed(() => this.formPokemon() ?? this.pokemon);
 
   /* ── Tab state ── */
   activeTab = signal(0);
 
   ngOnInit(): void {
     this.loadSpecies();
+    this.loadAbilityDescriptions();
   }
 
   onTabChange(index: number): void {
     this.activeTab.set(index);
-    this.selectedMove.set(null); // Panel schließen beim Tab-Wechsel
+    this.selectedMove.set(null);
 
     if (index === 1 && this.evolutionChain().length === 0) {
       this.loadEvolution();
     }
     if (index === 2 && this.moves().length === 0) {
       this.pokemonService.loadMovesForPokemon(
-        this.pokemon.moves.map((m) => m.move.name).slice(0, 20),
+        this.dp().moves.map((m) => m.move.name).slice(0, 20),
       );
       this.loadMoves();
     }
+  }
+
+  /* ── Move Sub-Tabs ── */
+  switchMoveTab(tab: 'level-up' | 'machine' | 'egg'): void {
+    this.moveTab.set(tab);
+    this.selectedMove.set(null);
+    if (tab === 'machine' && this.tmMoves().length === 0) this.loadMovesByMethod('machine');
+    if (tab === 'egg' && this.eggMoves().length === 0) this.loadMovesByMethod('egg');
+  }
+
+  /* ── Pokémon Forms ── */
+  get varieties(): any[] {
+    return this.species()?.varieties?.filter((v: any) => !v.is_default) ?? [];
+  }
+
+  switchForm(pokemonName: string): void {
+    if (pokemonName === this.currentFormName()) {
+      // toggle back to base
+      this.formPokemon.set(null);
+      this.currentFormName.set('');
+      this.moves.set([]);
+      this.tmMoves.set([]);
+      this.eggMoves.set([]);
+      return;
+    }
+    this.formLoading.set(true);
+    this.currentFormName.set(pokemonName);
+    this.api.getResource<Pokemon>('pokemon', undefined, pokemonName).subscribe({
+      next: (data) => {
+        this.formPokemon.set(data);
+        this.formLoading.set(false);
+        this.moves.set([]);
+        this.tmMoves.set([]);
+        this.eggMoves.set([]);
+        if (this.activeTab() === 2) this.loadMoves();
+      },
+      error: () => this.formLoading.set(false),
+    });
+  }
+
+  /* ── Open as page ── */
+  openDetailPage(): void {
+    this.router.navigate(['/pokemon', this.pokemon.id]);
+    this.dialogRef.close();
   }
 
   /* ── Move selection ── */
@@ -69,16 +137,55 @@ export class PokemonDialog implements OnInit {
     );
   }
 
+  /* ── Shiny Toggle ── */
+  toggleShiny(): void {
+    this.isShiny.update(v => !v);
+  }
+
+  /* ── Cry (Audio) ── */
+  playCry(): void {
+    const cryUrl = (this.pokemon.sprites as any).other?.cries?.latest
+      ?? (this.pokemon.sprites as any).cries?.latest;
+    if (!cryUrl || this.isCryPlaying()) return;
+
+    this.isCryPlaying.set(true);
+    const audio = new Audio(cryUrl);
+    audio.volume = 0.5;
+    audio.play().catch(() => null);
+    audio.addEventListener('ended', () => this.isCryPlaying.set(false));
+    audio.addEventListener('error', () => this.isCryPlaying.set(false));
+  }
+
+  hasCry(): boolean {
+    const s = this.pokemon.sprites as any;
+    return !!(s?.other?.cries?.latest ?? s?.cries?.latest);
+  }
+
+  /* ── Favorites ── */
+  toggleFavorite(): void {
+    this.favoritesService.toggle(this.pokemon.id);
+  }
+
   /* ── Getters ── */
-  get primaryColor(): string { return getPrimaryColor(this.pokemon.types); }
-  get primaryGlow(): string  { return getPrimaryGlow(this.pokemon.types); }
-  get spriteUrl(): string    { return this.pokemon.sprites.other['official-artwork'].front_default; }
-  get paddedId(): string     { return String(this.pokemon.id).padStart(3, '0'); }
+  get primaryColor(): string { return getPrimaryColor(this.dp().types); }
+  get primaryGlow(): string { return getPrimaryGlow(this.dp().types); }
+
+  get spriteUrl(): string {
+    const p = this.dp();
+    if (this.isShiny()) {
+      const shiny = (p.sprites as any).other?.['official-artwork']?.front_shiny
+        ?? (p.sprites as any).front_shiny;
+      if (shiny) return shiny;
+    }
+    return (p.sprites.other as any)['official-artwork'].front_default;
+  }
+
+  get paddedId(): string { return String(this.pokemon.id).padStart(3, '0'); }
 
   statPercent(value: number): number { return Math.min((value / 160) * 100, 100); }
   statColor(value: number): string {
     if (value >= 100) return '#30d158';
-    if (value >= 70)  return '#ffd60a';
+    if (value >= 70) return '#ffd60a';
     return this.primaryColor;
   }
 
@@ -91,10 +198,45 @@ export class PokemonDialog implements OnInit {
     return parseInt(parts[parts.length - 1], 10);
   }
 
+  /* ── Breeding helpers ── */
+  genderRatio(genderRate: number): { male: number; female: number } | null {
+    if (genderRate === -1) return null; // genderless
+    const female = (genderRate / 8) * 100;
+    return { male: 100 - female, female };
+  }
+
+  hatchSteps(hatchCounter: number): number {
+    return (hatchCounter + 1) * 255;
+  }
+
+  getAbilityDescription(englishName: string): string {
+    return this.abilityDetails()[englishName] ?? '';
+  }
+
   private loadSpecies(): void {
     this.api.getResource<any>('pokemon-species', undefined, String(this.pokemon.id)).subscribe({
       next: (data) => this.species.set(data),
       error: () => this.species.set(null),
+    });
+  }
+
+  private loadAbilityDescriptions(): void {
+    const abilities = this.pokemon.abilities.map(a => a.ability.name);
+    forkJoin(
+      abilities.map(name => this.api.getResource<any>('ability', undefined, name))
+    ).subscribe({
+      next: (details) => {
+        const lang = this.pokemonService.language();
+        const map: Record<string, string> = {};
+        details.forEach((d, i) => {
+          const entry =
+            d.effect_entries?.find((e: any) => e.language.name === lang) ??
+            d.effect_entries?.find((e: any) => e.language.name === 'en');
+          map[abilities[i]] = entry?.short_effect ?? entry?.effect ?? '';
+        });
+        this.abilityDetails.set(map);
+      },
+      error: () => { },
     });
   }
 
@@ -153,10 +295,8 @@ export class PokemonDialog implements OnInit {
 
   private loadMoves(): void {
     this.movesLoading.set(true);
-
     const lang = this.pokemonService.language();
-
-    const levelUpMoves = this.pokemon.moves
+    const levelUpMoves = this.dp().moves
       .map((entry) => {
         const detail = entry.version_group_details
           .filter((d) => d.move_learn_method.name === 'level-up')
@@ -169,10 +309,7 @@ export class PokemonDialog implements OnInit {
       .sort((a, b) => a!.level - b!.level)
       .slice(0, 20);
 
-    if (!levelUpMoves.length) {
-      this.movesLoading.set(false);
-      return;
-    }
+    if (!levelUpMoves.length) { this.movesLoading.set(false); return; }
 
     forkJoin(
       levelUpMoves.map((m) => this.api.getResource<any>('move', undefined, m!.name)),
@@ -180,19 +317,13 @@ export class PokemonDialog implements OnInit {
       next: (details) => {
         this.moves.set(
           details.map((d, i) => {
-            // Lokalisierter Effekttext
             const effectEntry =
               d.effect_entries?.find((e: any) => e.language.name === lang) ??
               d.effect_entries?.find((e: any) => e.language.name === 'en');
-
             return {
-              name: d.name,
-              level: levelUpMoves[i]!.level,
-              type: d.type.name,
-              power: d.power,
-              accuracy: d.accuracy,
-              pp: d.pp,
-              damageClass: d.damage_class.name,
+              name: d.name, level: levelUpMoves[i]!.level,
+              type: d.type.name, power: d.power, accuracy: d.accuracy,
+              pp: d.pp, damageClass: d.damage_class.name,
               effect: effectEntry?.short_effect ?? null,
             };
           }),
@@ -203,13 +334,51 @@ export class PokemonDialog implements OnInit {
     });
   }
 
+  private loadMovesByMethod(method: 'machine' | 'egg'): void {
+    const loadingSignal = method === 'machine' ? this.tmMovesLoading : this.eggMovesLoading;
+    const targetSignal = method === 'machine' ? this.tmMoves : this.eggMoves;
+    loadingSignal.set(true);
+    const lang = this.pokemonService.language();
+    const methodMoves = this.dp().moves
+      .filter((entry) => entry.version_group_details.some((d) => d.move_learn_method.name === method))
+      .map((entry) => ({ name: entry.move.name }))
+      .slice(0, 20);
+
+    if (!methodMoves.length) { loadingSignal.set(false); return; }
+
+    forkJoin(methodMoves.map((m) => this.api.getResource<any>('move', undefined, m.name))).subscribe({
+      next: (details) => {
+        targetSignal.set(
+          details.map((d) => {
+            const effectEntry =
+              d.effect_entries?.find((e: any) => e.language.name === lang) ??
+              d.effect_entries?.find((e: any) => e.language.name === 'en');
+            return {
+              name: d.name, level: 0,
+              type: d.type.name, power: d.power, accuracy: d.accuracy,
+              pp: d.pp, damageClass: d.damage_class.name,
+              effect: effectEntry?.short_effect ?? null,
+            };
+          }),
+        );
+        loadingSignal.set(false);
+      },
+      error: () => loadingSignal.set(false),
+    });
+  }
+
   damageClassIcon(cls: string): string {
     const map: Record<string, string> = {
       physical: '⚔️',
-      special:  '✨',
-      status:   '💫',
+      special: '✨',
+      status: '💫',
     };
     return map[cls] ?? '–';
+  }
+
+  eggGroupNames(species: any): string {
+    if (!species?.egg_groups?.length) return '—';
+    return species.egg_groups.map((g: any) => g.name).join(', ');
   }
 
   close(): void {

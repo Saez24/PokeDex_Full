@@ -6,81 +6,127 @@
   <p id="hero-sub" i18n class="hero-sub">Discover and explore the entire Pokémon world.</p>
 </section>
 
+<!-- ── Filter Bar ── -->
+<div class="filter-bar">
+  <!-- Search -->
+  <div class="search-wrap">
+    <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2.5" stroke-linecap="round">
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+    <input class="search-input" type="search" i18n-placeholder placeholder="Search by name or #ID…"
+      [value]="pokemonService.searchQuery()" (input)="onSearch($event)" aria-label="Search Pokémon" />
+  </div>
+
+  <!-- Type Filter -->
+  <select class="filter-select" [value]="pokemonService.selectedType()" (change)="onTypeFilter($event)"
+    aria-label="Filter by type" i18n-aria-label>
+    <option value="" i18n>All Types</option>
+    @for (type of ALL_TYPES; track type) {
+    <option [value]="type" style="text-transform:capitalize">{{ type }}</option>
+    }
+  </select>
+
+  <!-- Favorites Toggle -->
+  <button class="fav-toggle" [class.fav-toggle--active]="pokemonService.showFavorites()" (click)="toggleFavorites()"
+    i18n-aria-label aria-label="Show favorites only">
+    {{ pokemonService.showFavorites() ? '♥' : '♡' }}
+    <span i18n>Favorites</span>
+    @if (favoritesService.count() > 0) {
+    <span class="fav-count">{{ favoritesService.count() }}</span>
+    }
+  </button>
+</div>
+
+<!-- ── Generation Filter ── -->
+<div class="gen-chips" role="group" aria-label="Filter by generation" i18n-aria-label>
+  @for (gen of GENERATIONS; track gen.label; let i = $index) {
+  <button class="gen-chip" [class.gen-chip--active]="pokemonService.selectedGenIndex() === i" (click)="onGenFilter(i)"
+    [attr.aria-pressed]="pokemonService.selectedGenIndex() === i">
+    {{ gen.label }}
+  </button>
+  }
+</div>
+
 <!-- ── Grid ── -->
-<main class="grid">
-  @for (p of pokemonService.pokemon(); track trackById($index, p)) {
-    <div
-      class="card reveal"
-      [ngStyle]="{ '--card-glow': primaryGlow(p), '--card-color': primaryColor(p) }"
-      (click)="openDialog(p)"
-    >
-      <!-- Top row -->
-      <div class="card-top">
-        <span class="card-num">#{{ paddedId(p.id) }}</span>
-        <div class="card-dots">
-          @for (t of p.types; track t.slot) {
-            <span
-              class="type-dot"
-              [ngStyle]="{
+<main class="grid" role="list" aria-label="Pokémon list" i18n-aria-label>
+  @for (p of pokemonService.filteredPokemon(); track trackById($index, p)) {
+  <div class="card reveal" role="listitem"
+    [ngStyle]="{ '--card-glow': primaryGlow(p), '--card-color': primaryColor(p) }" (click)="openDialog(p)"
+    (keydown.enter)="openDialog(p)" (keydown.space)="openDialog(p)" tabindex="0"
+    [attr.aria-label]="pokemonService.getLocalizedName(p.species) + ', #' + paddedId(p.id)">
+    <!-- Top row -->
+    <div class="card-top">
+      <span class="card-num">#{{ paddedId(p.id) }}</span>
+      <div class="card-dots">
+        @for (t of p.types; track t.slot) {
+        <span class="type-dot" [ngStyle]="{
                 background: TYPE_COLORS[t.type.name],
                 'box-shadow': '0 0 6px ' + TYPE_COLORS[t.type.name],
-              }"
-            ></span>
-          }
-        </div>
+              }"></span>
+        }
+      </div>
+      <!-- Favorite indicator -->
+      @if (favoritesService.isFavorite(p.id)) {
+      <span class="card-fav" aria-label="Favorited" i18n-aria-label>♥</span>
+      }
+    </div>
+
+    <!-- Sprite -->
+    <div class="card-art">
+      <img class="card-sprite" [src]="spriteUrl(p)" [alt]="p.name" loading="lazy" />
+    </div>
+
+    <!-- Info -->
+    <div class="card-bottom">
+      <div class="card-name">{{ pokemonService.getLocalizedName(p.species) }}</div>
+      <div class="card-type-label">
+        {{ pokemonService.getLocalizedTypes(p).join(' · ') }}
       </div>
 
-      <!-- Sprite -->
-      <div class="card-art">
-        <img class="card-sprite" [src]="spriteUrl(p)" [alt]="p.name" loading="lazy" />
-      </div>
-
-      <!-- Info -->
-      <div class="card-bottom">
-        <!-- Deutscher / gewählter Name -->
-        <div class="card-name">{{ pokemonService.getLocalizedName(p.species) }}</div>
-
-        <!-- Gattung / Typ -->
-        <div class="card-type-label">
-          {{ pokemonService.getLocalizedTypes(p).join(' · ') }}
+      <!-- Mini stat bars -->
+      <div class="card-stats">
+        @for (stat of p.stats.slice(0, 3); track stat.stat.name) {
+        <div class="stat-micro">
+          <span class="stat-micro-label">{{ STAT_LABELS[stat.stat.name] }}</span>
+          <div class="stat-micro-track">
+            <div class="stat-micro-fill" [ngStyle]="{ width: statPercent(stat.base_stat) + '%' }"></div>
+          </div>
         </div>
-
-        <!-- Mini stat bars -->
-        <div class="card-stats">
-          @for (stat of p.stats.slice(0, 3); track stat.stat.name) {
-            <div class="stat-micro">
-              <span class="stat-micro-label">{{ STAT_LABELS[stat.stat.name] }}</span>
-              <div class="stat-micro-track">
-                <div
-                  class="stat-micro-fill"
-                  [ngStyle]="{ width: statPercent(stat.base_stat) + '%' }"
-                ></div>
-              </div>
-            </div>
-          }
-        </div>
+        }
       </div>
     </div>
+  </div>
+  }
+
+  <!-- No results -->
+  @if (!pokemonService.loading() && pokemonService.filteredPokemon().length === 0 && pokemonService.pokemon().length >
+  0) {
+  <div class="no-results">
+    <div class="no-results-icon">🔍</div>
+    <p i18n>No Pokémon found. Try a different search.</p>
+  </div>
   }
 
   <!-- Skeleton cards while loading -->
   @if (pokemonService.loading()) {
-    @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
-      <div class="card skeleton"></div>
-    }
+  @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+  <div class="card skeleton" aria-hidden="true"></div>
+  }
   }
 </main>
 
 <!-- ── Load More ── -->
-@if (pokemonService.hasMore()) {
-  <div class="load-wrap">
-    <button class="load-btn" [disabled]="pokemonService.loading()" (click)="loadMore()">
-      @if (pokemonService.loading()) {
-        <mat-spinner diameter="18" strokeWidth="2" />
-      } @else {
-        Load More
-      }
-    </button>
-    <span id="load-hint" i18n class="load-hint">Load 20 more Pokémon</span>
-  </div>
+@if (pokemonService.hasMore() && !pokemonService.searchQuery() && !pokemonService.selectedType()) {
+<div class="load-wrap">
+  <button class="load-btn" [disabled]="pokemonService.loading()" (click)="loadMore()">
+    @if (pokemonService.loading()) {
+    <mat-spinner diameter="18" strokeWidth="2" />
+    } @else {
+    <span i18n>Load More</span>
+    }
+  </button>
+  <span id="load-hint" i18n class="load-hint">Load 20 more Pokémon</span>
+</div>
 }

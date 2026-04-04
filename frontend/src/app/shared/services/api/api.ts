@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { retry, timeout } from 'rxjs/operators';
 import { PokeEndpoint } from '../../models/poke-endpoint.type';
 
 @Injectable({
@@ -13,6 +14,6 @@ export class Api {
     let url = `${this.apiUrl}${endpoint}`;
     if (slug) url += `/${slug}`;
     if (query) url += `?${query}`;
-    return this.http.get<T>(url);
+    return this.http.get<T>(url).pipe(timeout(10000), retry({ count: 2, delay: 800 }));
   }
 }
