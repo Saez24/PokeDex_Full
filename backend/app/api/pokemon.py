@@ -10,12 +10,14 @@ Flow für /pokemon?limit=20&offset=0:
   1. Redis hit?  → sofort zurück
   2. PostgreSQL  → in Redis speichern → zurück
 """
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_session
 from app.services import cache as cache_svc
 from app.services import redis as redis_svc
+from app.services.pokeapi import POKEAPI_BASE, TIMEOUT
 
 router = APIRouter()
 
@@ -128,7 +130,18 @@ async def get_pokemon(
     # 2. PostgreSQL
     data = await cache_svc.get_pokemon(session, name_or_id)
     if not data:
-        raise HTTPException(status_code=404, detail=f"Pokemon '{name_or_id}' not found")
+        # 3. Fallback: PokeAPI direkt (für Form-Varianten wie venusaur-mega, gmax, etc.)
+        try:
+            async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+                resp = await client.get(f"{POKEAPI_BASE}/pokemon/{name_or_id}")
+                if resp.status_code == 404:
+                    raise HTTPException(status_code=404, detail=f"Pokemon '{name_or_id}' not found")
+                resp.raise_for_status()
+                data = resp.json()
+        except HTTPException:
+            raise
+        except Exception:
+            raise HTTPException(status_code=404, detail=f"Pokemon '{name_or_id}' not found")
 
     # In Redis speichern — sowohl unter Name als auch ID
     await redis_svc.set(redis_key, data)
@@ -151,8 +164,17 @@ async def get_species(
         return data
 
     # Fallback für Formvarianten (z.B. "pyroar-male" → Species "pyroar"):
-    # Pokémon-Daten laden und daraus den echten Species-Namen ermitteln.
+    # 1. Pokémon-Daten aus DB laden
     poke_data = await cache_svc.get_pokemon(session, name_or_id)
+    # 2. Falls nicht in DB: PokeAPI direkt ansprechen (Mega/Gmax etc.)
+    if not poke_data:
+        try:
+            async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+                resp = await client.get(f"{POKEAPI_BASE}/pokemon/{name_or_id}")
+                if resp.status_code == 200:
+                    poke_data = resp.json()
+        except Exception:
+            pass
     if poke_data:
         species_name = poke_data.get("species", {}).get("name")
         if species_name and species_name != name_or_id:

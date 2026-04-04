@@ -200,6 +200,7 @@ async def run_seed(limit: int, offset: int, skip_moves: bool):
             await _write_state(state)
             all_abilities: set[str] = set()
             all_moves: set[str] = set()
+            all_forms: set[str] = set()  # Formvarianten (Mega, Gmax, etc.)
 
             for i, item in enumerate(pokemon_list["results"]):
                 if await is_cancelled():
@@ -256,6 +257,11 @@ async def run_seed(limit: int, offset: int, skip_moves: bool):
                             await cache_svc.save_species(session, species_data)
                             session.add(SeedProgress(entity="species", name=species_name, status="done"))
 
+                            # Formvarianten für späteres Seeden merken
+                            for v in species_data.get("varieties", []):
+                                if not v.get("is_default"):
+                                    all_forms.add(v["pokemon"]["name"])
+
                             chain_url = species_data["evolution_chain"]["url"]
                             chain_id = int(chain_url.rstrip("/").split("/")[-1])
                             already_chain = await session.execute(
@@ -275,8 +281,46 @@ async def run_seed(limit: int, offset: int, skip_moves: bool):
                             await session.rollback()
                             state["errors"].append(f"species/{species_name}: {e}")
                             await _write_state(state)
+                    else:
+                        # Auch wenn Species bereits gecacht: Formvarianten aus DB lesen
+                        existing_species = await cache_svc.get_species(session, species_name)
+                        if existing_species:
+                            for v in existing_species.get("varieties", []):
+                                if not v.get("is_default"):
+                                    all_forms.add(v["pokemon"]["name"])
 
-            # ── 3. Abilities ──
+            # ── 3. Formvarianten (Mega, Gmax, Alola etc.) ──
+            state["current_step"] = f"Loading {len(all_forms)} form variants …"
+            await _write_state(state)
+            async with AsyncSessionLocal() as session:
+                for form_name in sorted(all_forms):
+                    if await is_cancelled():
+                        break
+                    already = await session.execute(
+                        select(SeedProgress).where(
+                            SeedProgress.entity == "pokemon",
+                            SeedProgress.name == form_name,
+                            SeedProgress.status == "done",
+                        )
+                    )
+                    if already.scalar_one_or_none():
+                        continue
+                    try:
+                        form_data = await fetch_endpoint(client, "pokemon", form_name)
+                        await cache_svc.save_pokemon(session, form_data)
+                        session.add(SeedProgress(entity="pokemon", name=form_name, status="done"))
+                        await session.commit()
+                        # Abilities und Moves der Form ebenfalls merken
+                        for a in form_data.get("abilities", []):
+                            all_abilities.add(a["ability"]["name"])
+                        for m in form_data.get("moves", []):
+                            all_moves.add(m["move"]["name"])
+                    except Exception as e:
+                        await session.rollback()
+                        state["errors"].append(f"pokemon-form/{form_name}: {e}")
+                        await _write_state(state)
+
+            # ── 4. Abilities ──
             state["current_step"] = f"Loading {len(all_abilities)} abilities …"
             await _write_state(state)
             async with AsyncSessionLocal() as session:
@@ -302,7 +346,7 @@ async def run_seed(limit: int, offset: int, skip_moves: bool):
                         state["errors"].append(f"ability/{ab_name}: {e}")
                         await _write_state(state)
 
-            # ── 4. Moves (optional) ──
+            # ── 5. Moves (optional) ──
             if not skip_moves:
                 state["current_step"] = f"Loading {len(all_moves)} moves …"
                 await _write_state(state)
