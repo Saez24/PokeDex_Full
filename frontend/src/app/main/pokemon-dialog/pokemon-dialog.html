@@ -77,7 +77,7 @@
       }
 
       <!-- Pokémon Forms -->
-      @if (varieties.length > 0) {
+      @if (varieties().length > 0) {
       <div class="d-forms">
         @if (formLoading()) {
         <span class="d-form-loading">⋯</span>
@@ -86,7 +86,7 @@
           (click)="switchForm(pokemon.name)" i18n-aria-label aria-label="Base form">
           Base
         </button>
-        @for (v of varieties; track v.pokemon.name) {
+        @for (v of varieties(); track v.pokemon.name) {
         <button class="d-form-chip" [class.d-form-chip--active]="currentFormName() === v.pokemon.name"
           (click)="switchForm(v.pokemon.name)" [attr.aria-label]="v.pokemon.name">
           {{ v.pokemon.name.replace(pokemon.name + '-', '').replace(/-/g, ' ') }}

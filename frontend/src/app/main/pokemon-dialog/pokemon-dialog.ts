@@ -53,6 +53,11 @@ export class PokemonDialog implements OnInit {
   formLoading = signal(false);
   currentFormName = signal('');
 
+  /* ── Varieties (computed → reaktiv in OnPush) ── */
+  readonly varieties = computed<any[]>(
+    () => this.species()?.varieties?.filter((v: any) => !v.is_default) ?? []
+  );
+
   /* ── Move tabs ── */
   moveTab = signal<'level-up' | 'machine' | 'egg'>('level-up');
   tmMoves = signal<MoveRow[]>([]);
@@ -101,10 +106,6 @@ export class PokemonDialog implements OnInit {
   }
 
   /* ── Pokémon Forms ── */
-  get varieties(): any[] {
-    return this.species()?.varieties?.filter((v: any) => !v.is_default) ?? [];
-  }
-
   switchForm(pokemonName: string): void {
     if (pokemonName === this.currentFormName()) {
       // toggle back to base

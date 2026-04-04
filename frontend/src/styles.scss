@@ -212,7 +212,7 @@ html.light-theme app-pokemon-dialog {
 
     /* Art area stays always dark for design integrity */
     .d-art {
-      background: rgb(18, 18, 20);
+      background: var(--app-background);
     }
     .d-art-footer {
       background: linear-gradient(to top, var(--d-bg) 60%, transparent);
