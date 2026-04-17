@@ -6,39 +6,6 @@
   <p id="hero-sub" i18n class="hero-sub">Discover and explore the entire Pokémon world.</p>
 </section>
 
-<!-- ── Filter Bar ── -->
-<div class="filter-bar">
-  <!-- Search -->
-  <div class="search-wrap">
-    <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2.5" stroke-linecap="round">
-      <circle cx="11" cy="11" r="8" />
-      <line x1="21" y1="21" x2="16.65" y2="16.65" />
-    </svg>
-    <input class="search-input" type="search" i18n-placeholder placeholder="Search by name or #ID…"
-      [value]="pokemonService.searchQuery()" (input)="onSearch($event)" aria-label="Search Pokémon" />
-  </div>
-
-  <!-- Type Filter -->
-  <select class="filter-select" [value]="pokemonService.selectedType()" (change)="onTypeFilter($event)"
-    aria-label="Filter by type" i18n-aria-label>
-    <option value="" i18n>All Types</option>
-    @for (type of ALL_TYPES; track type) {
-    <option [value]="type" style="text-transform:capitalize">{{ type }}</option>
-    }
-  </select>
-
-  <!-- Favorites Toggle -->
-  <button class="fav-toggle" [class.fav-toggle--active]="pokemonService.showFavorites()" (click)="toggleFavorites()"
-    i18n-aria-label aria-label="Show favorites only">
-    {{ pokemonService.showFavorites() ? '♥' : '♡' }}
-    <span i18n>Favorites</span>
-    @if (favoritesService.count() > 0) {
-    <span class="fav-count">{{ favoritesService.count() }}</span>
-    }
-  </button>
-</div>
-
 <!-- ── Generation Filter ── -->
 <div class="gen-chips" role="group" aria-label="Filter by generation" i18n-aria-label>
   @for (gen of GENERATIONS; track gen.label; let i = $index) {

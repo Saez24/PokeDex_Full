@@ -163,22 +163,8 @@ export class Content implements OnInit, AfterViewInit, OnDestroy {
     return 4;
   }
 
-  onSearch(event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
-    this.pokemonService.setSearch(value);
-  }
-
-  onTypeFilter(event: Event): void {
-    const value = (event.target as HTMLSelectElement).value;
-    this.pokemonService.selectedType.set(value);
-  }
-
   onGenFilter(index: number): void {
     this.pokemonService.setGeneration(index);
-  }
-
-  toggleFavorites(): void {
-    this.pokemonService.showFavorites.update((v) => !v);
   }
 
   primaryColor(p: Pokemon): string {
