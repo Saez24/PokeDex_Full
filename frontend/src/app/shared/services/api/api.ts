@@ -10,7 +10,7 @@ export class Api {
   private http = inject(HttpClient);
   // Relative URL → nginx proxiert /api/ intern zum FastAPI-Backend.
   // Standalone-Fallback (kein Backend): https://pokeapi.co/api/v2/
-  private apiUrl = 'https://pokeapi.co/api/v2/';
+  private apiUrl = '/api/v2/';
 
   getResource<T>(endpoint: PokeEndpoint, query?: string, slug?: string) {
     let url = `${this.apiUrl}${endpoint}`;
