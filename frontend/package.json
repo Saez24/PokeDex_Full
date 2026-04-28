@@ -9,7 +9,7 @@
     "test": "ng test"
   },
   "private": true,
-  "packageManager": "npm@11.12.1",
+  "packageManager": "npm@11.13.0",
   "dependencies": {
     "@angular/cdk": "~21.2.8",
     "@angular/common": "^21.2.10",
@@ -28,9 +28,9 @@
     "@angular/cli": "^21.2.8",
     "@angular/compiler-cli": "^21.2.10",
     "@angular/localize": "^21.2.10",
-    "jsdom": "^29.0.2",
+    "jsdom": "^29.1.0",
     "prettier": "^3.8.3",
     "typescript": "~5.9.3",
-    "vitest": "^4.1.4"
+    "vitest": "^4.1.5"
   }
 }
