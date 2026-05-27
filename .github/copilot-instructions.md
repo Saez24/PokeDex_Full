@@ -1,1 +1,0 @@
-/home/dev/programmieren/Agents/copilot-instructions.md
