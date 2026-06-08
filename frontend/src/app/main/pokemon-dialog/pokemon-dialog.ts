@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
 import { NgStyle, DecimalPipe } from '@angular/common';
@@ -23,7 +23,6 @@ import { FavoritesService } from '../../shared/services/favorites/favorites';
   imports: [MatDialogModule, MatTabsModule, NgStyle, DecimalPipe],
   templateUrl: './pokemon-dialog.html',
   styleUrl: './pokemon-dialog.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PokemonDialog implements OnInit {
   readonly dialogRef = inject(MatDialogRef<PokemonDialog>);

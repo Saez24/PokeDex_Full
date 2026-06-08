@@ -1,5 +1,4 @@
 import {
-    ChangeDetectionStrategy,
     Component,
     computed,
     inject,
@@ -38,7 +37,6 @@ function emptySlots(): CompareSlot[] {
     imports: [RouterLink, NgStyle],
     templateUrl: './compare.html',
     styleUrl: './compare.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Compare {
     private readonly api = inject(Api);

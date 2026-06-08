@@ -1,6 +1,5 @@
 import {
   AfterViewInit,
-  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -33,7 +32,6 @@ import { Pokemon } from '../../shared/models/pokemon.model';
   imports: [MatButtonModule, MatProgressSpinnerModule, NgStyle, ScrollingModule],
   templateUrl: './content.html',
   styleUrl: './content.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Content implements OnInit, AfterViewInit, OnDestroy {
   private dialog = inject(MatDialog);

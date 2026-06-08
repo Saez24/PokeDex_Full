@@ -1,5 +1,4 @@
 import {
-    ChangeDetectionStrategy,
     Component,
     computed,
     inject,
@@ -30,7 +29,6 @@ import { SeoService } from '../shared/services/seo/seo';
     imports: [MatTabsModule, NgStyle, DecimalPipe],
     templateUrl: './pokemon-detail.html',
     styleUrl: './pokemon-detail.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PokemonDetail implements OnInit {
     private readonly route = inject(ActivatedRoute);

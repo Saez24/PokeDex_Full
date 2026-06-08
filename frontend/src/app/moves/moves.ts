@@ -1,5 +1,4 @@
 import {
-    ChangeDetectionStrategy,
     Component,
     computed,
     inject,
@@ -26,7 +25,6 @@ export const DAMAGE_CLASS_COLORS: Record<string, string> = {
     imports: [RouterLink, NgStyle, TitleCasePipe],
     templateUrl: './moves.html',
     styleUrl: './moves.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Moves {
     private readonly api = inject(Api);

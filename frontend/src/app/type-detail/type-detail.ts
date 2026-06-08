@@ -1,5 +1,4 @@
 import {
-    ChangeDetectionStrategy,
     Component,
     computed,
     inject,
@@ -39,7 +38,6 @@ const PAGE = 24;
     imports: [RouterLink, NgStyle, TitleCasePipe],
     templateUrl: './type-detail.html',
     styleUrl: './type-detail.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TypeDetail {
     private readonly route = inject(ActivatedRoute);

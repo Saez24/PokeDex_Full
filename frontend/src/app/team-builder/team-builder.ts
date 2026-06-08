@@ -1,5 +1,4 @@
 import {
-    ChangeDetectionStrategy,
     Component,
     computed,
     inject,
@@ -29,7 +28,6 @@ function emptySlots(): TeamSlot[] {
     imports: [RouterLink, NgStyle, FormsModule],
     templateUrl: './team-builder.html',
     styleUrl: './team-builder.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeamBuilder {
     private readonly api = inject(Api);

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgStyle, TitleCasePipe } from '@angular/common';
 import { TYPE_COLORS } from '../shared/utils/pokemon-types.util';
@@ -60,7 +60,6 @@ export const CHART: readonly (readonly number[])[] = [
     imports: [RouterLink, NgStyle, TitleCasePipe],
     templateUrl: './type-chart.html',
     styleUrl: './type-chart.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TypeChart {
     private readonly seoService = inject(SeoService);
