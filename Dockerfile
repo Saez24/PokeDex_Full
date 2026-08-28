@@ -10,7 +10,7 @@ COPY frontend/ .
 RUN npm run build -- --configuration=production
 
 # ── Stage 2: Python-Dependencies ─────────────────────────────────────────────
-FROM python:3.13-slim-bookworm AS backend-builder
+FROM python:3.14-slim-bookworm AS backend-builder
 
 RUN apt-get update && apt-get install -y \
     gcc g++ libpq-dev libffi-dev \
@@ -26,7 +26,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir gunicorn
 
 # ── Stage 3: Runtime ──────────────────────────────────────────────────────────
-FROM python:3.13-slim-bookworm
+FROM python:3.14-slim-bookworm
 
 LABEL maintainer="Saez24" \
       description="PokéDex Fullstack — nginx (SPA) + gunicorn (API) via supervisord"
@@ -45,7 +45,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Python packages
-COPY --from=backend-builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
+COPY --from=backend-builder /usr/local/lib/python3.14/site-packages /usr/local/lib/python3.14/site-packages
 COPY --from=backend-builder /usr/local/bin /usr/local/bin
 
 # Backend-Code (app/, alembic/, alembic.ini, ...)
