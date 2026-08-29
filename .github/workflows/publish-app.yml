@@ -14,7 +14,6 @@ on:
       - "supervisord.conf"
       - "entrypoint-combined.sh"
       - ".github/workflows/publish-app.yml"
-  workflow_dispatch: {}
 
 permissions:
   contents: read
